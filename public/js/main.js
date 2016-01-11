@@ -38274,6 +38274,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -38292,6 +38293,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _MetronomeActionsJsx = __webpack_require__(169);
+
+	var _MetronomeActionsJsx2 = _interopRequireDefault(_MetronomeActionsJsx);
+
 	var StartButton = (function (_Component) {
 	  _inherits(StartButton, _Component);
 
@@ -38304,15 +38309,31 @@
 	  _createClass(StartButton, [{
 	    key: "render",
 	    value: function render() {
+	      var playing = this.props.appState.playing;
+	      var button = playing ? _react2["default"].createElement(
+	        "button",
+	        { type: "button", id: "toggle", className: "btn-toggle", onClick: this.stop.bind(this) },
+	        "Stop"
+	      ) : _react2["default"].createElement(
+	        "button",
+	        { type: "button", id: "toggle", className: "btn-toggle", onClick: this.start.bind(this) },
+	        "Start"
+	      );
 	      return _react2["default"].createElement(
 	        "p",
 	        null,
-	        _react2["default"].createElement(
-	          "button",
-	          { type: "button", id: "toggle", className: "btn-toggle" },
-	          "Start"
-	        )
+	        button
 	      );
+	    }
+	  }, {
+	    key: "start",
+	    value: function start() {
+	      _MetronomeActionsJsx2["default"].start();
+	    }
+	  }, {
+	    key: "stop",
+	    value: function stop() {
+	      _MetronomeActionsJsx2["default"].stop();
 	    }
 	  }]);
 
