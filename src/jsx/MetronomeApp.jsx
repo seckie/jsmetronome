@@ -10,6 +10,9 @@ import BellIcons from "./components/BellIcons.jsx";
 import StartButton from "./components/StartButton.jsx";
 
 import MetronomeStore from "./MetronomeStore.jsx";
+import MetronomeActions from "./MetronomeActions.jsx";
+
+let timer;
 
 class MetronomeApp extends Component {
   static getStores (): Array {
@@ -17,6 +20,16 @@ class MetronomeApp extends Component {
   }
   static calculateState (prevState): State {
     var state = MetronomeStore.getState().toJS();
+    if (state.playing) {
+      timer = setTimeout(() => {
+        MetronomeActions.tick();
+      }, state.interval);
+    } else {
+      if (timer) {
+       clearTimeout(timer);
+       timer = null;
+      }
+    }
     return state;
   }
 

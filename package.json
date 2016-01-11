@@ -2,6 +2,7 @@
   "name": "website-package",
   "version": "0.0.0",
   "dependencies": {
+    "classnames": "^2.2.3",
     "flux": "^2.1.1",
     "lodash": "^3.10.1",
     "react": "^0.14.6",

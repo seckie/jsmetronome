@@ -1,24 +1,28 @@
 "use strict";
 import React, { Component } from "react";
+import { BELL_VALUES } from "../Constants.jsx";
 
 class BellSetting extends Component {
   render () {
+    var buttonGroup1 = BELL_VALUES.map((val, i) => {
+      if (i > 3) { return; }
+      var label = val === 0 ? "-" : val;
+      return <button type="button" id={"bell-" + val} className={"btn-bell bell" + val} key={"btn-bell" + val}>{label}</button>
+    });
+    var buttonGroup2 = BELL_VALUES.map((val, i) => {
+      if (i < 4) { return; }
+      return <button type="button" id={"bell-" + val} className={"btn-bell bell" + val} key={"btn-bell" + val}>{val}</button>
+    });
     return (
       <p>
-        <span className="row">
-          <button type="button" id="bell-0" className="btn-bell bell0">0</button>
-          <button type="button" id="bell-2" className="btn-bell bell2">2</button>
-          <button type="button" id="bell-3" className="btn-bell bell3">3</button>
-          <button type="button" id="bell-4" className="btn-bell bell4">4</button>
-        </span>
-        <span className="row">
-          <button type="button" id="bell-5" className="btn-bell bell5">5</button>
-          <button type="button" id="bell-6" className="btn-bell bell6">6</button>
-          <button type="button" id="bell-7" className="btn-bell bell7">7</button>
-          <button type="button" id="bell-8" className="btn-bell bell8">8</button>
-        </span>
+        <span className="row">{buttonGroup1}</span>
+        <span className="row">{buttonGroup2}</span>
       </p>
     );
+  }
+
+  setBellCount (count) {
+    MetronomeActions.setBellCount(count);
   }
 };
 

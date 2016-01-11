@@ -134,3 +134,46 @@ body {
 img {
   vertical-align: bottom;
 }
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.app {
+  width: 300px;
+  background: #d8d8d8;
+  border: 3px solid #979797;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+.bell-icons {
+  zoom: 1;
+}
+.bell-icons:before,
+.bell-icons:after {
+  content: "";
+  display: table;
+}
+.bell-icons:after {
+  clear: both;
+}
+.bell-icons.bell-icons1 {
+  text-align: center;
+}
+.bell-icons.bell-icons1 .bell-icon {
+  float: none;
+}
+.bell-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+  background-color: #979797;
+}
+.bell-icon-top {
+  background-color: #454545;
+}
+.bell-icon-active {
+  background-color: #d0021b;
+}

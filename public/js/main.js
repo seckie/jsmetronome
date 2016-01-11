@@ -18710,17 +18710,23 @@
 
 	var _componentsBellSettingJsx2 = _interopRequireDefault(_componentsBellSettingJsx);
 
-	var _componentsBellIconsJsx = __webpack_require__(174);
+	var _componentsBellIconsJsx = __webpack_require__(175);
 
 	var _componentsBellIconsJsx2 = _interopRequireDefault(_componentsBellIconsJsx);
 
-	var _componentsStartButtonJsx = __webpack_require__(177);
+	var _componentsStartButtonJsx = __webpack_require__(179);
 
 	var _componentsStartButtonJsx2 = _interopRequireDefault(_componentsStartButtonJsx);
 
-	var _MetronomeStoreJsx = __webpack_require__(178);
+	var _MetronomeStoreJsx = __webpack_require__(180);
 
 	var _MetronomeStoreJsx2 = _interopRequireDefault(_MetronomeStoreJsx);
+
+	var _MetronomeActionsJsx = __webpack_require__(169);
+
+	var _MetronomeActionsJsx2 = _interopRequireDefault(_MetronomeActionsJsx);
+
+	var timer = undefined;
 
 	var MetronomeApp = (function (_Component) {
 	  _inherits(MetronomeApp, _Component);
@@ -18753,6 +18759,16 @@
 	    key: "calculateState",
 	    value: function calculateState(prevState) {
 	      var state = _MetronomeStoreJsx2["default"].getState().toJS();
+	      if (state.playing) {
+	        timer = setTimeout(function () {
+	          _MetronomeActionsJsx2["default"].tick();
+	        }, state.interval);
+	      } else {
+	        if (timer) {
+	          clearTimeout(timer);
+	          timer = null;
+	        }
+	      }
 	      return state;
 	    }
 	  }]);
@@ -25367,11 +25383,11 @@
 	      var appState = this.props.appState;
 	      var modeButton = appState.tradMode === true ? _react2["default"].createElement(
 	        "button",
-	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-trad", onClick: this.changeMode.bind(this) },
+	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-trad", onClick: this.setMode.bind(this) },
 	        "Trad"
 	      ) : _react2["default"].createElement(
 	        "button",
-	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-one", onClick: this.changeMode.bind(this) },
+	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-one", onClick: this.setMode.bind(this) },
 	        "+- 1"
 	      );
 	      return _react2["default"].createElement(
@@ -25393,9 +25409,9 @@
 	      );
 	    }
 	  }, {
-	    key: "changeMode",
-	    value: function changeMode() {
-	      _MetronomeActionsJsx2["default"].changeTradMode(!this.props.appState.tradMode);
+	    key: "setMode",
+	    value: function setMode() {
+	      _MetronomeActionsJsx2["default"].setTradMode(!this.props.appState.tradMode);
 	    }
 	  }, {
 	    key: "decrement",
@@ -25443,6 +25459,11 @@
 	      type: "stop"
 	    });
 	  },
+	  tick: function tick() {
+	    _MetronomeDispatcherJsx2["default"].dispatch({
+	      type: "tick"
+	    });
+	  },
 	  tempoUp: function tempoUp() {
 	    _MetronomeDispatcherJsx2["default"].dispatch({
 	      type: "tempoUp"
@@ -25453,15 +25474,15 @@
 	      type: "tempoDown"
 	    });
 	  },
-	  changeTradMode: function changeTradMode(tradMode) {
+	  setTradMode: function setTradMode(tradMode) {
 	    _MetronomeDispatcherJsx2["default"].dispatch({
-	      type: "changeTradMode",
+	      type: "setTradMode",
 	      tradMode: tradMode
 	    });
 	  },
-	  changeBellCount: function changeBellCount(count) {
+	  setBellCount: function setBellCount(count) {
 	    _MetronomeDispatcherJsx2["default"].dispatch({
-	      type: "changeBellCount",
+	      type: "setBellCount",
 	      count: count
 	    });
 	  }
@@ -25761,6 +25782,8 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _ConstantsJsx = __webpack_require__(174);
+
 	var BellSetting = (function (_Component) {
 	  _inherits(BellSetting, _Component);
 
@@ -25773,58 +25796,46 @@
 	  _createClass(BellSetting, [{
 	    key: "render",
 	    value: function render() {
+	      var buttonGroup1 = _ConstantsJsx.BELL_VALUES.map(function (val, i) {
+	        if (i > 3) {
+	          return;
+	        }
+	        var label = val === 0 ? "-" : val;
+	        return _react2["default"].createElement(
+	          "button",
+	          { type: "button", id: "bell-" + val, className: "btn-bell bell" + val, key: "btn-bell" + val },
+	          label
+	        );
+	      });
+	      var buttonGroup2 = _ConstantsJsx.BELL_VALUES.map(function (val, i) {
+	        if (i < 4) {
+	          return;
+	        }
+	        return _react2["default"].createElement(
+	          "button",
+	          { type: "button", id: "bell-" + val, className: "btn-bell bell" + val, key: "btn-bell" + val },
+	          val
+	        );
+	      });
 	      return _react2["default"].createElement(
 	        "p",
 	        null,
 	        _react2["default"].createElement(
 	          "span",
 	          { className: "row" },
-	          _react2["default"].createElement(
-	            "button",
-	            { type: "button", id: "bell-0", className: "btn-bell bell0" },
-	            "0"
-	          ),
-	          _react2["default"].createElement(
-	            "button",
-	            { type: "button", id: "bell-2", className: "btn-bell bell2" },
-	            "2"
-	          ),
-	          _react2["default"].createElement(
-	            "button",
-	            { type: "button", id: "bell-3", className: "btn-bell bell3" },
-	            "3"
-	          ),
-	          _react2["default"].createElement(
-	            "button",
-	            { type: "button", id: "bell-4", className: "btn-bell bell4" },
-	            "4"
-	          )
+	          buttonGroup1
 	        ),
 	        _react2["default"].createElement(
 	          "span",
 	          { className: "row" },
-	          _react2["default"].createElement(
-	            "button",
-	            { type: "button", id: "bell-5", className: "btn-bell bell5" },
-	            "5"
-	          ),
-	          _react2["default"].createElement(
-	            "button",
-	            { type: "button", id: "bell-6", className: "btn-bell bell6" },
-	            "6"
-	          ),
-	          _react2["default"].createElement(
-	            "button",
-	            { type: "button", id: "bell-7", className: "btn-bell bell7" },
-	            "7"
-	          ),
-	          _react2["default"].createElement(
-	            "button",
-	            { type: "button", id: "bell-8", className: "btn-bell bell8" },
-	            "8"
-	          )
+	          buttonGroup2
 	        )
 	      );
+	    }
+	  }, {
+	    key: "setBellCount",
+	    value: function setBellCount(count) {
+	      MetronomeActions.setBellCount(count);
 	    }
 	  }]);
 
@@ -25838,6 +25849,22 @@
 
 /***/ },
 /* 174 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var Constants = {
+	  BELL_VALUES: [0, 2, 3, 4, 5, 6, 7, 8]
+	};
+
+	exports["default"] = Constants;
+	module.exports = exports["default"];
+
+/***/ },
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25859,29 +25886,58 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _lodash = __webpack_require__(175);
+	var _lodash = __webpack_require__(176);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
+
+	var _classnames = __webpack_require__(178);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
 
 	var BellIcons = (function (_Component) {
 	  _inherits(BellIcons, _Component);
 
-	  function BellIcons() {
+	  function BellIcons(props) {
 	    _classCallCheck(this, BellIcons);
 
-	    _get(Object.getPrototypeOf(BellIcons.prototype), "constructor", this).apply(this, arguments);
+	    _get(Object.getPrototypeOf(BellIcons.prototype), "constructor", this).call(this, props);
+	    this.state = { active: false };
 	  }
 
 	  _createClass(BellIcons, [{
+	    key: "componentWillReceiveProps",
+	    value: function componentWillReceiveProps(nextProps) {
+	      var _this = this;
+
+	      if (!nextProps.appState.playing) {
+	        this.setState({ active: false });
+	        return;
+	      }
+	      if (this.props.appState.time !== nextProps.appState.time) {
+	        this.setState({ active: true });
+	        setTimeout(function () {
+	          _this.setState({ active: false });
+	        }, 100);
+	      }
+	    }
+	  }, {
 	    key: "render",
 	    value: function render() {
-	      var bellCount = this.props.bellCount;
-	      var icons = bellCount <= 1 ? _react2["default"].createElement("span", { className: "bell-icon" }) : _lodash2["default"].map(_lodash2["default"].range(bellCount), function (count) {
-	        return count === 0 ? _react2["default"].createElement("span", { className: "bell-icon top" }) : _react2["default"].createElement("span", { className: "bell-icon" });
+	      var count = this.props.appState.bellCount;
+	      var beat = this.props.appState.beat;
+	      var cName = (0, _classnames2["default"])("bell-icon", {
+	        "bell-icon-active": this.state.active
+	      });
+	      var icons = count <= 1 ? _react2["default"].createElement("span", { className: cName }) : _lodash2["default"].map(_lodash2["default"].range(count), function (i) {
+	        var cName = (0, _classnames2["default"])("bell-icon", {
+	          "bell-icon-top": i === 0,
+	          "bell-icon-active": i + 1 === beat && this.state.active
+	        });
+	        return _react2["default"].createElement("span", { className: cName });
 	      });
 	      return _react2["default"].createElement(
 	        "p",
-	        null,
+	        { className: "bell-icons bell-icons" + count },
 	        icons
 	      );
 	    }
@@ -25896,7 +25952,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 175 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -38251,10 +38307,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(176)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(177)(module), (function() { return this; }())))
 
 /***/ },
-/* 176 */
+/* 177 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -38270,7 +38326,61 @@
 
 
 /***/ },
-/* 177 */
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
+
+/***/ },
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38346,7 +38456,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 178 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38392,21 +38502,40 @@
 	        tempo: 100,
 	        range: 1,
 	        tradMode: false,
-	        bellCount: 1
+	        bellCount: 0,
+	        beat: 1, // 1 <= beat <= bellCount
+	        time: Date.now(),
+	        interval: 0
 	      });
 	    }
 	  }, {
 	    key: "reduce",
 	    value: function reduce(state, action) {
+	      var tempo = state.get("tempo");
 	      switch (action.type) {
 	        case "start":
-	          return state.set("playing", true);
+	          var interval = 60 / tempo * 1000;
+	          return state.merge({
+	            playing: true,
+	            time: Date.now(),
+	            interval: interval
+	          });
 	          break;
 	        case "stop":
 	          return state.set("playing", false);
 	          break;
+	        case "tick":
+	          // TODO
+	          // Correct tempo interval (may cause by system performance)
+	          // through Date.now()
+	          var beat = getBeat(state);
+	          console.log('beat:', beat);
+	          return state.merge({
+	            beat: beat,
+	            time: Date.now()
+	          });
+	          break;
 	        case "tempoUp":
-	          var tempo = state.get("tempo");
 	          var tradMode = state.get("tradMode");
 	          // TODO
 	          // if in "tradMode"
@@ -38415,7 +38544,6 @@
 	          return state.set("tempo", tempo + range);
 	          break;
 	        case "tempoDown":
-	          var tempo = state.get("tempo");
 	          var tradMode = state.get("tradMode");
 	          // TODO
 	          // if in "tradMode"
@@ -38423,8 +38551,7 @@
 	          var range = tradMode ? getRange(tempo) : 1;
 	          return state.set("tempo", tempo - range);
 	          break;
-	        case "changeTradMode":
-	          var tempo = state.get("tempo");
+	        case "setTradMode":
 	          var tradMode = action.tradMode;
 	          var range = tradMode ? getRange(tempo) : 1;
 	          return state.merge({
@@ -38432,7 +38559,7 @@
 	            range: range
 	          });
 	          break;
-	        case "changeBellCount":
+	        case "setBellCount":
 	          return state.set("bellCount", action.bellCount);
 	          break;
 	        default:
@@ -38468,6 +38595,14 @@
 	      range = 1;
 	  }
 	  return range;
+	}
+
+	function getBeat(state) {
+	  var beat = state.get("beat") + 1;
+	  if (beat >= state.get("bellCount")) {
+	    beat = 1;
+	  }
+	  return beat;
 	}
 
 	var instance = new MetronomeStore(_MetronomeDispatcherJsx2["default"]);

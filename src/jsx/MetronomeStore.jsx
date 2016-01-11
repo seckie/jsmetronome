@@ -4,7 +4,6 @@ import Immutable from "immutable"
 import { MapStore } from "flux/utils";
 import MetronomeDispatcher from "./MetronomeDispatcher.jsx";
 
-
 class MetronomeStore extends MapStore {
   getInitialState (): State {
     return Immutable.Map({
@@ -12,19 +11,38 @@ class MetronomeStore extends MapStore {
       tempo: 100,
       range: 1,
       tradMode: false,
-      bellCount: 1
+      bellCount: 0,
+      beat: 1, // 1 <= beat <= bellCount
+      time: Date.now(),
+      interval: 0
     });
   }
   reduce (state: State, action: Object): State {
+    var tempo = state.get("tempo");
     switch (action.type) {
       case "start":
-        return state.set("playing", true);
+        var interval = 60 / tempo * 1000;
+        return state.merge({
+          playing: true,
+          time: Date.now(),
+          interval: interval
+        });
         break;
       case "stop":
         return state.set("playing", false);
         break;
+      case "tick":
+        // TODO
+        // Correct tempo interval (may cause by system performance)
+        // through Date.now()
+        var beat = getBeat(state);
+        console.log('beat:', beat);
+        return state.merge({
+          beat: beat,
+          time: Date.now()
+        });
+        break;
       case "tempoUp":
-        var tempo = state.get("tempo");
         var tradMode = state.get("tradMode");
         // TODO
         // if in "tradMode"
@@ -33,7 +51,6 @@ class MetronomeStore extends MapStore {
         return state.set("tempo", tempo + range);
         break;
       case "tempoDown":
-        var tempo = state.get("tempo");
         var tradMode = state.get("tradMode");
         // TODO
         // if in "tradMode"
@@ -41,8 +58,7 @@ class MetronomeStore extends MapStore {
         var range = tradMode ? getRange(tempo) : 1;
         return state.set("tempo", tempo - range);
         break;
-      case "changeTradMode":
-        var tempo = state.get("tempo");
+      case "setTradMode":
         var tradMode = action.tradMode;
         var range = tradMode ? getRange(tempo) : 1;
         return state.merge({
@@ -50,7 +66,7 @@ class MetronomeStore extends MapStore {
           range: range
         });
         break;
-      case "changeBellCount":
+      case "setBellCount":
         return state.set("bellCount",  action.bellCount);
         break;
       default:
@@ -81,6 +97,14 @@ function getRange(tempo) {
       range = 1;
   }
   return range;
+}
+
+function getBeat(state) {
+  var beat = state.get("beat") + 1;
+  if (beat >= state.get("bellCount")) {
+    beat = 1;
+  }
+  return beat;
 }
 
 const instance = new MetronomeStore(MetronomeDispatcher);

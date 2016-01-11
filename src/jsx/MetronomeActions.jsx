@@ -12,6 +12,11 @@ const MetronomeActions = {
       type: "stop"
     });
   },
+  tick () {
+    MetronomeDispatcher.dispatch({
+      type: "tick"
+    });
+  },
   tempoUp () {
     MetronomeDispatcher.dispatch({
       type: "tempoUp"
@@ -22,15 +27,15 @@ const MetronomeActions = {
       type: "tempoDown"
     });
   },
-  changeTradMode (tradMode: Boolean) {
+  setTradMode (tradMode: Boolean) {
     MetronomeDispatcher.dispatch({
-      type: "changeTradMode",
+      type: "setTradMode",
       tradMode: tradMode
     });
   },
-  changeBellCount (count: Number) {
+  setBellCount (count: Number) {
     MetronomeDispatcher.dispatch({
-      type: "changeBellCount",
+      type: "setBellCount",
       count: count
     });
   }
