@@ -16,18 +16,18 @@ class MetronomeApp extends Component {
     return [ MetronomeStore ];
   }
   static calculateState (prevState): State {
-    var state = MetronomeStore.getState();
+    var state = MetronomeStore.getState().toJS();
     return state;
   }
 
   render () {
     return (
       <div className="app">
-        <TempoValue metronomeState={this.state} />
-        <TempoSetting metronomeState={this.state} />
-        <BellSetting metronomeState={this.state} />
-        <BellIcons metronomeState={this.state} />
-        <StartButton metronomeState={this.state} />
+        <TempoValue appState={this.state} />
+        <TempoSetting appState={this.state} />
+        <BellSetting appState={this.state} />
+        <BellIcons appState={this.state} />
+        <StartButton appState={this.state} />
       </div>
     );
   }

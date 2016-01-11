@@ -18706,19 +18706,19 @@
 
 	var _componentsTempoSettingJsx2 = _interopRequireDefault(_componentsTempoSettingJsx);
 
-	var _componentsBellSettingJsx = __webpack_require__(169);
+	var _componentsBellSettingJsx = __webpack_require__(173);
 
 	var _componentsBellSettingJsx2 = _interopRequireDefault(_componentsBellSettingJsx);
 
-	var _componentsBellIconsJsx = __webpack_require__(170);
+	var _componentsBellIconsJsx = __webpack_require__(174);
 
 	var _componentsBellIconsJsx2 = _interopRequireDefault(_componentsBellIconsJsx);
 
-	var _componentsStartButtonJsx = __webpack_require__(173);
+	var _componentsStartButtonJsx = __webpack_require__(177);
 
 	var _componentsStartButtonJsx2 = _interopRequireDefault(_componentsStartButtonJsx);
 
-	var _MetronomeStoreJsx = __webpack_require__(174);
+	var _MetronomeStoreJsx = __webpack_require__(178);
 
 	var _MetronomeStoreJsx2 = _interopRequireDefault(_MetronomeStoreJsx);
 
@@ -18737,11 +18737,11 @@
 	      return _react2["default"].createElement(
 	        "div",
 	        { className: "app" },
-	        _react2["default"].createElement(_componentsTempoValueJsx2["default"], { metronomeState: this.state }),
-	        _react2["default"].createElement(_componentsTempoSettingJsx2["default"], { metronomeState: this.state }),
-	        _react2["default"].createElement(_componentsBellSettingJsx2["default"], { metronomeState: this.state }),
-	        _react2["default"].createElement(_componentsBellIconsJsx2["default"], { metronomeState: this.state }),
-	        _react2["default"].createElement(_componentsStartButtonJsx2["default"], { metronomeState: this.state })
+	        _react2["default"].createElement(_componentsTempoValueJsx2["default"], { appState: this.state }),
+	        _react2["default"].createElement(_componentsTempoSettingJsx2["default"], { appState: this.state }),
+	        _react2["default"].createElement(_componentsBellSettingJsx2["default"], { appState: this.state }),
+	        _react2["default"].createElement(_componentsBellIconsJsx2["default"], { appState: this.state }),
+	        _react2["default"].createElement(_componentsStartButtonJsx2["default"], { appState: this.state })
 	      );
 	    }
 	  }], [{
@@ -18752,7 +18752,7 @@
 	  }, {
 	    key: "calculateState",
 	    value: function calculateState(prevState) {
-	      var state = _MetronomeStoreJsx2["default"].getState();
+	      var state = _MetronomeStoreJsx2["default"].getState().toJS();
 	      return state;
 	    }
 	  }]);
@@ -25304,10 +25304,11 @@
 	  _createClass(TempoValue, [{
 	    key: "render",
 	    value: function render() {
+	      var appState = this.props.appState;
 	      return _react2["default"].createElement(
 	        "p",
 	        null,
-	        _react2["default"].createElement("input", { type: "text", value: "", id: "tempo", className: "tempo", disabled: true })
+	        _react2["default"].createElement("input", { type: "text", value: appState.tempo, id: "tempo", className: "tempo", disabled: true })
 	      );
 	    }
 	  }]);
@@ -25316,6 +25317,10 @@
 	})(_react.Component);
 
 	;
+
+	TempoValue.defaultProps = {
+	  appState: {}
+	};
 
 	exports["default"] = TempoValue;
 	module.exports = exports["default"];
@@ -25343,6 +25348,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _MetronomeActionsJsx = __webpack_require__(169);
+
+	var _MetronomeActionsJsx2 = _interopRequireDefault(_MetronomeActionsJsx);
+
 	var TempoSetting = (function (_Component) {
 	  _inherits(TempoSetting, _Component);
 
@@ -25355,25 +25364,48 @@
 	  _createClass(TempoSetting, [{
 	    key: "render",
 	    value: function render() {
+	      var appState = this.props.appState;
+	      var modeButton = appState.tradMode === true ? _react2["default"].createElement(
+	        "button",
+	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-trad", onClick: this.changeMode.bind(this) },
+	        "Trad"
+	      ) : _react2["default"].createElement(
+	        "button",
+	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-one", onClick: this.changeMode.bind(this) },
+	        "+- 1"
+	      );
 	      return _react2["default"].createElement(
 	        "p",
 	        null,
 	        _react2["default"].createElement(
 	          "button",
-	          { type: "button", id: "tempo-up", className: "btn-tempo up" },
-	          "+"
+	          { type: "button", id: "tempo-down", className: "btn-tempo down", onClick: this.decrement.bind(this) },
+	          "- ",
+	          appState.range
 	        ),
+	        modeButton,
 	        _react2["default"].createElement(
 	          "button",
-	          { type: "button", id: "tempo-mode", className: "btn-tempo mode" },
-	          "+- 0"
-	        ),
-	        _react2["default"].createElement(
-	          "button",
-	          { type: "button", id: "tempo-down", className: "btn-tempo down" },
-	          "-"
+	          { type: "button", id: "tempo-up", className: "btn-tempo up", onClick: this.increment.bind(this) },
+	          "+ ",
+	          appState.range
 	        )
 	      );
+	    }
+	  }, {
+	    key: "changeMode",
+	    value: function changeMode() {
+	      _MetronomeActionsJsx2["default"].changeTradMode(!this.props.appState.tradMode);
+	    }
+	  }, {
+	    key: "decrement",
+	    value: function decrement() {
+	      _MetronomeActionsJsx2["default"].tempoDown();
+	    }
+	  }, {
+	    key: "increment",
+	    value: function increment() {
+	      _MetronomeActionsJsx2["default"].tempoUp();
 	    }
 	  }]);
 
@@ -25387,6 +25419,327 @@
 
 /***/ },
 /* 169 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+	var _MetronomeDispatcherJsx = __webpack_require__(170);
+
+	var _MetronomeDispatcherJsx2 = _interopRequireDefault(_MetronomeDispatcherJsx);
+
+	var MetronomeActions = {
+	  start: function start() {
+	    _MetronomeDispatcherJsx2["default"].dispatch({
+	      type: "start"
+	    });
+	  },
+	  stop: function stop() {
+	    _MetronomeDispatcherJsx2["default"].dispatch({
+	      type: "stop"
+	    });
+	  },
+	  tempoUp: function tempoUp() {
+	    _MetronomeDispatcherJsx2["default"].dispatch({
+	      type: "tempoUp"
+	    });
+	  },
+	  tempoDown: function tempoDown() {
+	    _MetronomeDispatcherJsx2["default"].dispatch({
+	      type: "tempoDown"
+	    });
+	  },
+	  changeTradMode: function changeTradMode(tradMode) {
+	    _MetronomeDispatcherJsx2["default"].dispatch({
+	      type: "changeTradMode",
+	      tradMode: tradMode
+	    });
+	  },
+	  changeBellCount: function changeBellCount(count) {
+	    _MetronomeDispatcherJsx2["default"].dispatch({
+	      type: "changeBellCount",
+	      count: count
+	    });
+	  }
+	};
+
+	exports["default"] = MetronomeActions;
+	module.exports = exports["default"];
+
+/***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _flux = __webpack_require__(171);
+
+	var instance = new _flux.Dispatcher();
+	exports["default"] = instance;
+	module.exports = exports["default"];
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright (c) 2014-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 */
+
+	module.exports.Dispatcher = __webpack_require__(172);
+
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright (c) 2014-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule Dispatcher
+	 * 
+	 * @preventMunge
+	 */
+
+	'use strict';
+
+	exports.__esModule = true;
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var invariant = __webpack_require__(152);
+
+	var _prefix = 'ID_';
+
+	/**
+	 * Dispatcher is used to broadcast payloads to registered callbacks. This is
+	 * different from generic pub-sub systems in two ways:
+	 *
+	 *   1) Callbacks are not subscribed to particular events. Every payload is
+	 *      dispatched to every registered callback.
+	 *   2) Callbacks can be deferred in whole or part until other callbacks have
+	 *      been executed.
+	 *
+	 * For example, consider this hypothetical flight destination form, which
+	 * selects a default city when a country is selected:
+	 *
+	 *   var flightDispatcher = new Dispatcher();
+	 *
+	 *   // Keeps track of which country is selected
+	 *   var CountryStore = {country: null};
+	 *
+	 *   // Keeps track of which city is selected
+	 *   var CityStore = {city: null};
+	 *
+	 *   // Keeps track of the base flight price of the selected city
+	 *   var FlightPriceStore = {price: null}
+	 *
+	 * When a user changes the selected city, we dispatch the payload:
+	 *
+	 *   flightDispatcher.dispatch({
+	 *     actionType: 'city-update',
+	 *     selectedCity: 'paris'
+	 *   });
+	 *
+	 * This payload is digested by `CityStore`:
+	 *
+	 *   flightDispatcher.register(function(payload) {
+	 *     if (payload.actionType === 'city-update') {
+	 *       CityStore.city = payload.selectedCity;
+	 *     }
+	 *   });
+	 *
+	 * When the user selects a country, we dispatch the payload:
+	 *
+	 *   flightDispatcher.dispatch({
+	 *     actionType: 'country-update',
+	 *     selectedCountry: 'australia'
+	 *   });
+	 *
+	 * This payload is digested by both stores:
+	 *
+	 *   CountryStore.dispatchToken = flightDispatcher.register(function(payload) {
+	 *     if (payload.actionType === 'country-update') {
+	 *       CountryStore.country = payload.selectedCountry;
+	 *     }
+	 *   });
+	 *
+	 * When the callback to update `CountryStore` is registered, we save a reference
+	 * to the returned token. Using this token with `waitFor()`, we can guarantee
+	 * that `CountryStore` is updated before the callback that updates `CityStore`
+	 * needs to query its data.
+	 *
+	 *   CityStore.dispatchToken = flightDispatcher.register(function(payload) {
+	 *     if (payload.actionType === 'country-update') {
+	 *       // `CountryStore.country` may not be updated.
+	 *       flightDispatcher.waitFor([CountryStore.dispatchToken]);
+	 *       // `CountryStore.country` is now guaranteed to be updated.
+	 *
+	 *       // Select the default city for the new country
+	 *       CityStore.city = getDefaultCityForCountry(CountryStore.country);
+	 *     }
+	 *   });
+	 *
+	 * The usage of `waitFor()` can be chained, for example:
+	 *
+	 *   FlightPriceStore.dispatchToken =
+	 *     flightDispatcher.register(function(payload) {
+	 *       switch (payload.actionType) {
+	 *         case 'country-update':
+	 *         case 'city-update':
+	 *           flightDispatcher.waitFor([CityStore.dispatchToken]);
+	 *           FlightPriceStore.price =
+	 *             getFlightPriceStore(CountryStore.country, CityStore.city);
+	 *           break;
+	 *     }
+	 *   });
+	 *
+	 * The `country-update` payload will be guaranteed to invoke the stores'
+	 * registered callbacks in order: `CountryStore`, `CityStore`, then
+	 * `FlightPriceStore`.
+	 */
+
+	var Dispatcher = (function () {
+	  function Dispatcher() {
+	    _classCallCheck(this, Dispatcher);
+
+	    this._callbacks = {};
+	    this._isDispatching = false;
+	    this._isHandled = {};
+	    this._isPending = {};
+	    this._lastID = 1;
+	  }
+
+	  /**
+	   * Registers a callback to be invoked with every dispatched payload. Returns
+	   * a token that can be used with `waitFor()`.
+	   */
+
+	  Dispatcher.prototype.register = function register(callback) {
+	    var id = _prefix + this._lastID++;
+	    this._callbacks[id] = callback;
+	    return id;
+	  };
+
+	  /**
+	   * Removes a callback based on its token.
+	   */
+
+	  Dispatcher.prototype.unregister = function unregister(id) {
+	    !this._callbacks[id] ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatcher.unregister(...): `%s` does not map to a registered callback.', id) : invariant(false) : undefined;
+	    delete this._callbacks[id];
+	  };
+
+	  /**
+	   * Waits for the callbacks specified to be invoked before continuing execution
+	   * of the current callback. This method should only be used by a callback in
+	   * response to a dispatched payload.
+	   */
+
+	  Dispatcher.prototype.waitFor = function waitFor(ids) {
+	    !this._isDispatching ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatcher.waitFor(...): Must be invoked while dispatching.') : invariant(false) : undefined;
+	    for (var ii = 0; ii < ids.length; ii++) {
+	      var id = ids[ii];
+	      if (this._isPending[id]) {
+	        !this._isHandled[id] ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatcher.waitFor(...): Circular dependency detected while ' + 'waiting for `%s`.', id) : invariant(false) : undefined;
+	        continue;
+	      }
+	      !this._callbacks[id] ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatcher.waitFor(...): `%s` does not map to a registered callback.', id) : invariant(false) : undefined;
+	      this._invokeCallback(id);
+	    }
+	  };
+
+	  /**
+	   * Dispatches a payload to all registered callbacks.
+	   */
+
+	  Dispatcher.prototype.dispatch = function dispatch(payload) {
+	    !!this._isDispatching ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatch.dispatch(...): Cannot dispatch in the middle of a dispatch.') : invariant(false) : undefined;
+	    this._startDispatching(payload);
+	    try {
+	      for (var id in this._callbacks) {
+	        if (this._isPending[id]) {
+	          continue;
+	        }
+	        this._invokeCallback(id);
+	      }
+	    } finally {
+	      this._stopDispatching();
+	    }
+	  };
+
+	  /**
+	   * Is this Dispatcher currently dispatching.
+	   */
+
+	  Dispatcher.prototype.isDispatching = function isDispatching() {
+	    return this._isDispatching;
+	  };
+
+	  /**
+	   * Call the callback stored with the given id. Also do some internal
+	   * bookkeeping.
+	   *
+	   * @internal
+	   */
+
+	  Dispatcher.prototype._invokeCallback = function _invokeCallback(id) {
+	    this._isPending[id] = true;
+	    this._callbacks[id](this._pendingPayload);
+	    this._isHandled[id] = true;
+	  };
+
+	  /**
+	   * Set up bookkeeping needed when dispatching.
+	   *
+	   * @internal
+	   */
+
+	  Dispatcher.prototype._startDispatching = function _startDispatching(payload) {
+	    for (var id in this._callbacks) {
+	      this._isPending[id] = false;
+	      this._isHandled[id] = false;
+	    }
+	    this._pendingPayload = payload;
+	    this._isDispatching = true;
+	  };
+
+	  /**
+	   * Clear bookkeeping used for dispatching.
+	   *
+	   * @internal
+	   */
+
+	  Dispatcher.prototype._stopDispatching = function _stopDispatching() {
+	    delete this._pendingPayload;
+	    this._isDispatching = false;
+	  };
+
+	  return Dispatcher;
+	})();
+
+	module.exports = Dispatcher;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+
+/***/ },
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25484,7 +25837,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 170 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25506,7 +25859,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _lodash = __webpack_require__(171);
+	var _lodash = __webpack_require__(175);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -25543,7 +25896,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 171 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -37898,10 +38251,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(172)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(176)(module), (function() { return this; }())))
 
 /***/ },
-/* 172 */
+/* 176 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -37917,7 +38270,7 @@
 
 
 /***/ },
-/* 173 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -37972,7 +38325,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 174 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -37997,7 +38350,7 @@
 
 	var _fluxUtils = __webpack_require__(149);
 
-	var _MetronomeDispatcherJsx = __webpack_require__(175);
+	var _MetronomeDispatcherJsx = __webpack_require__(170);
 
 	var _MetronomeDispatcherJsx2 = _interopRequireDefault(_MetronomeDispatcherJsx);
 
@@ -38016,7 +38369,8 @@
 	      return _immutable2["default"].Map({
 	        playing: false,
 	        tempo: 100,
-	        tempoMode: "one",
+	        range: 1,
+	        tradMode: false,
 	        bellCount: 1
 	      });
 	    }
@@ -38031,13 +38385,31 @@
 	          return state.set("playing", false);
 	          break;
 	        case "tempoUp":
-	          return state.set("tempo", state.tempo += action.tempo);
+	          var tempo = state.get("tempo");
+	          var tradMode = state.get("tradMode");
+	          // TODO
+	          // if in "tradMode"
+	          // round next value to nearest trad value
+	          var range = tradMode ? getRange(tempo) : 1;
+	          return state.set("tempo", tempo + range);
 	          break;
 	        case "tempoDown":
-	          return state.set("tempo", state.tempo -= action.tempo);
+	          var tempo = state.get("tempo");
+	          var tradMode = state.get("tradMode");
+	          // TODO
+	          // if in "tradMode"
+	          // round next value to nearest trad value
+	          var range = tradMode ? getRange(tempo) : 1;
+	          return state.set("tempo", tempo - range);
 	          break;
-	        case "changeTempoMode":
-	          return state.set("tempoMode", action.tempoMode);
+	        case "changeTradMode":
+	          var tempo = state.get("tempo");
+	          var tradMode = action.tradMode;
+	          var range = tradMode ? getRange(tempo) : 1;
+	          return state.merge({
+	            tradMode: action.tradMode,
+	            range: range
+	          });
 	          break;
 	        case "changeBellCount":
 	          return state.set("bellCount", action.bellCount);
@@ -38053,277 +38425,33 @@
 
 	;
 
+	function getRange(tempo) {
+	  var range = 1;
+	  switch (true) {
+	    case tempo < 60:
+	      range = 2;
+	      break;
+	    case 60 < tempo && tempo <= 72:
+	      range = 3;
+	      break;
+	    case 72 < tempo && tempo <= 120:
+	      range = 4;
+	      break;
+	    case 120 < tempo && tempo <= 144:
+	      range = 6;
+	      break;
+	    case 144 < tempo:
+	      range = 8;
+	      break;
+	    default:
+	      range = 1;
+	  }
+	  return range;
+	}
+
 	var instance = new MetronomeStore(_MetronomeDispatcherJsx2["default"]);
 	exports["default"] = instance;
 	module.exports = exports["default"];
-
-/***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _flux = __webpack_require__(176);
-
-	var instance = new _flux.Dispatcher();
-	exports["default"] = instance;
-	module.exports = exports["default"];
-
-/***/ },
-/* 176 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright (c) 2014-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 */
-
-	module.exports.Dispatcher = __webpack_require__(177);
-
-
-/***/ },
-/* 177 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright (c) 2014-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule Dispatcher
-	 * 
-	 * @preventMunge
-	 */
-
-	'use strict';
-
-	exports.__esModule = true;
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var invariant = __webpack_require__(152);
-
-	var _prefix = 'ID_';
-
-	/**
-	 * Dispatcher is used to broadcast payloads to registered callbacks. This is
-	 * different from generic pub-sub systems in two ways:
-	 *
-	 *   1) Callbacks are not subscribed to particular events. Every payload is
-	 *      dispatched to every registered callback.
-	 *   2) Callbacks can be deferred in whole or part until other callbacks have
-	 *      been executed.
-	 *
-	 * For example, consider this hypothetical flight destination form, which
-	 * selects a default city when a country is selected:
-	 *
-	 *   var flightDispatcher = new Dispatcher();
-	 *
-	 *   // Keeps track of which country is selected
-	 *   var CountryStore = {country: null};
-	 *
-	 *   // Keeps track of which city is selected
-	 *   var CityStore = {city: null};
-	 *
-	 *   // Keeps track of the base flight price of the selected city
-	 *   var FlightPriceStore = {price: null}
-	 *
-	 * When a user changes the selected city, we dispatch the payload:
-	 *
-	 *   flightDispatcher.dispatch({
-	 *     actionType: 'city-update',
-	 *     selectedCity: 'paris'
-	 *   });
-	 *
-	 * This payload is digested by `CityStore`:
-	 *
-	 *   flightDispatcher.register(function(payload) {
-	 *     if (payload.actionType === 'city-update') {
-	 *       CityStore.city = payload.selectedCity;
-	 *     }
-	 *   });
-	 *
-	 * When the user selects a country, we dispatch the payload:
-	 *
-	 *   flightDispatcher.dispatch({
-	 *     actionType: 'country-update',
-	 *     selectedCountry: 'australia'
-	 *   });
-	 *
-	 * This payload is digested by both stores:
-	 *
-	 *   CountryStore.dispatchToken = flightDispatcher.register(function(payload) {
-	 *     if (payload.actionType === 'country-update') {
-	 *       CountryStore.country = payload.selectedCountry;
-	 *     }
-	 *   });
-	 *
-	 * When the callback to update `CountryStore` is registered, we save a reference
-	 * to the returned token. Using this token with `waitFor()`, we can guarantee
-	 * that `CountryStore` is updated before the callback that updates `CityStore`
-	 * needs to query its data.
-	 *
-	 *   CityStore.dispatchToken = flightDispatcher.register(function(payload) {
-	 *     if (payload.actionType === 'country-update') {
-	 *       // `CountryStore.country` may not be updated.
-	 *       flightDispatcher.waitFor([CountryStore.dispatchToken]);
-	 *       // `CountryStore.country` is now guaranteed to be updated.
-	 *
-	 *       // Select the default city for the new country
-	 *       CityStore.city = getDefaultCityForCountry(CountryStore.country);
-	 *     }
-	 *   });
-	 *
-	 * The usage of `waitFor()` can be chained, for example:
-	 *
-	 *   FlightPriceStore.dispatchToken =
-	 *     flightDispatcher.register(function(payload) {
-	 *       switch (payload.actionType) {
-	 *         case 'country-update':
-	 *         case 'city-update':
-	 *           flightDispatcher.waitFor([CityStore.dispatchToken]);
-	 *           FlightPriceStore.price =
-	 *             getFlightPriceStore(CountryStore.country, CityStore.city);
-	 *           break;
-	 *     }
-	 *   });
-	 *
-	 * The `country-update` payload will be guaranteed to invoke the stores'
-	 * registered callbacks in order: `CountryStore`, `CityStore`, then
-	 * `FlightPriceStore`.
-	 */
-
-	var Dispatcher = (function () {
-	  function Dispatcher() {
-	    _classCallCheck(this, Dispatcher);
-
-	    this._callbacks = {};
-	    this._isDispatching = false;
-	    this._isHandled = {};
-	    this._isPending = {};
-	    this._lastID = 1;
-	  }
-
-	  /**
-	   * Registers a callback to be invoked with every dispatched payload. Returns
-	   * a token that can be used with `waitFor()`.
-	   */
-
-	  Dispatcher.prototype.register = function register(callback) {
-	    var id = _prefix + this._lastID++;
-	    this._callbacks[id] = callback;
-	    return id;
-	  };
-
-	  /**
-	   * Removes a callback based on its token.
-	   */
-
-	  Dispatcher.prototype.unregister = function unregister(id) {
-	    !this._callbacks[id] ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatcher.unregister(...): `%s` does not map to a registered callback.', id) : invariant(false) : undefined;
-	    delete this._callbacks[id];
-	  };
-
-	  /**
-	   * Waits for the callbacks specified to be invoked before continuing execution
-	   * of the current callback. This method should only be used by a callback in
-	   * response to a dispatched payload.
-	   */
-
-	  Dispatcher.prototype.waitFor = function waitFor(ids) {
-	    !this._isDispatching ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatcher.waitFor(...): Must be invoked while dispatching.') : invariant(false) : undefined;
-	    for (var ii = 0; ii < ids.length; ii++) {
-	      var id = ids[ii];
-	      if (this._isPending[id]) {
-	        !this._isHandled[id] ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatcher.waitFor(...): Circular dependency detected while ' + 'waiting for `%s`.', id) : invariant(false) : undefined;
-	        continue;
-	      }
-	      !this._callbacks[id] ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatcher.waitFor(...): `%s` does not map to a registered callback.', id) : invariant(false) : undefined;
-	      this._invokeCallback(id);
-	    }
-	  };
-
-	  /**
-	   * Dispatches a payload to all registered callbacks.
-	   */
-
-	  Dispatcher.prototype.dispatch = function dispatch(payload) {
-	    !!this._isDispatching ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Dispatch.dispatch(...): Cannot dispatch in the middle of a dispatch.') : invariant(false) : undefined;
-	    this._startDispatching(payload);
-	    try {
-	      for (var id in this._callbacks) {
-	        if (this._isPending[id]) {
-	          continue;
-	        }
-	        this._invokeCallback(id);
-	      }
-	    } finally {
-	      this._stopDispatching();
-	    }
-	  };
-
-	  /**
-	   * Is this Dispatcher currently dispatching.
-	   */
-
-	  Dispatcher.prototype.isDispatching = function isDispatching() {
-	    return this._isDispatching;
-	  };
-
-	  /**
-	   * Call the callback stored with the given id. Also do some internal
-	   * bookkeeping.
-	   *
-	   * @internal
-	   */
-
-	  Dispatcher.prototype._invokeCallback = function _invokeCallback(id) {
-	    this._isPending[id] = true;
-	    this._callbacks[id](this._pendingPayload);
-	    this._isHandled[id] = true;
-	  };
-
-	  /**
-	   * Set up bookkeeping needed when dispatching.
-	   *
-	   * @internal
-	   */
-
-	  Dispatcher.prototype._startDispatching = function _startDispatching(payload) {
-	    for (var id in this._callbacks) {
-	      this._isPending[id] = false;
-	      this._isHandled[id] = false;
-	    }
-	    this._pendingPayload = payload;
-	    this._isDispatching = true;
-	  };
-
-	  /**
-	   * Clear bookkeeping used for dispatching.
-	   *
-	   * @internal
-	   */
-
-	  Dispatcher.prototype._stopDispatching = function _stopDispatching() {
-	    delete this._pendingPayload;
-	    this._isDispatching = false;
-	  };
-
-	  return Dispatcher;
-	})();
-
-	module.exports = Dispatcher;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }
 /******/ ]);

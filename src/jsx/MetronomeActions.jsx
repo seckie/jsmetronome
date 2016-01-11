@@ -1,35 +1,33 @@
 "use strict";
-import MetronomeDispathcer from "./MetronomeDispatcher.jsx";
+import MetronomeDispatcher from "./MetronomeDispatcher.jsx";
 
 const MetronomeActions = {
   start () {
     MetronomeDispatcher.dispatch({
       type: "start"
     });
-  }
+  },
   stop () {
     MetronomeDispatcher.dispatch({
       type: "stop"
     });
-  }
-  tempoUp (tempo: Number) {
+  },
+  tempoUp () {
     MetronomeDispatcher.dispatch({
-      type: "tempoUp",
-      tempo: tempo
+      type: "tempoUp"
     });
-  }
-  tempoDown (tempo: Number) {
+  },
+  tempoDown () {
     MetronomeDispatcher.dispatch({
-      type: "tempoDown",
-      tempo: tempo
+      type: "tempoDown"
     });
-  }
-  changeTempoMode (mode: String) {
+  },
+  changeTradMode (tradMode: Boolean) {
     MetronomeDispatcher.dispatch({
-      type: "changeTempoMode",
-      mode: mode
+      type: "changeTradMode",
+      tradMode: tradMode
     });
-  }
+  },
   changeBellCount (count: Number) {
     MetronomeDispatcher.dispatch({
       type: "changeBellCount",
@@ -38,4 +36,4 @@ const MetronomeActions = {
   }
 };
 
-
+export default MetronomeActions;

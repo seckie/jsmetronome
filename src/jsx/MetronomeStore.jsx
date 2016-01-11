@@ -10,7 +10,8 @@ class MetronomeStore extends MapStore {
     return Immutable.Map({
       playing: false,
       tempo: 100,
-      tempoMode: "one",
+      range: 1,
+      tradMode: false,
       bellCount: 1
     });
   }
@@ -23,13 +24,31 @@ class MetronomeStore extends MapStore {
         return state.set("playing", false);
         break;
       case "tempoUp":
-        return state.set("tempo", state.tempo += action.tempo);
+        var tempo = state.get("tempo");
+        var tradMode = state.get("tradMode");
+        // TODO
+        // if in "tradMode"
+        // round next value to nearest trad value
+        var range = tradMode ? getRange(tempo) : 1;
+        return state.set("tempo", tempo + range);
         break;
       case "tempoDown":
-        return state.set("tempo", state.tempo -= action.tempo);
+        var tempo = state.get("tempo");
+        var tradMode = state.get("tradMode");
+        // TODO
+        // if in "tradMode"
+        // round next value to nearest trad value
+        var range = tradMode ? getRange(tempo) : 1;
+        return state.set("tempo", tempo - range);
         break;
-      case "changeTempoMode":
-        return state.set("tempoMode",  action.tempoMode);
+      case "changeTradMode":
+        var tempo = state.get("tempo");
+        var tradMode = action.tradMode;
+        var range = tradMode ? getRange(tempo) : 1;
+        return state.merge({
+          tradMode: action.tradMode,
+          range: range
+        });
         break;
       case "changeBellCount":
         return state.set("bellCount",  action.bellCount);
@@ -39,6 +58,30 @@ class MetronomeStore extends MapStore {
     }
   }
 };
+
+function getRange(tempo) {
+  var range = 1;
+  switch (true) {
+    case (tempo < 60):
+      range = 2;
+      break;
+    case (60 < tempo && tempo <= 72):
+      range = 3;
+      break;
+    case (72 < tempo && tempo <= 120):
+      range = 4;
+      break;
+    case (120 < tempo && tempo <= 144):
+      range = 6;
+      break;
+    case (144 < tempo):
+      range = 8;
+      break;
+    default:
+      range = 1;
+  }
+  return range;
+}
 
 const instance = new MetronomeStore(MetronomeDispatcher);
 export default instance;
