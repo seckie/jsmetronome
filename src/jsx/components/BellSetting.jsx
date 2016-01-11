@@ -1,17 +1,26 @@
 "use strict";
 import React, { Component } from "react";
+import classnames from "classnames";
 import { BELL_VALUES } from "../Constants.jsx";
+import MetronomeActions from "../MetronomeActions.jsx";
 
 class BellSetting extends Component {
   render () {
+    var count = this.props.appState.bellCount;
     var buttonGroup1 = BELL_VALUES.map((val, i) => {
       if (i > 3) { return; }
       var label = val === 0 ? "-" : val;
-      return <button type="button" id={"bell-" + val} className={"btn-bell bell" + val} key={"btn-bell" + val}>{label}</button>
+      var cName = classnames("btn-bell", "btn-bell" + val, {
+        "btn-bell-active": count === val
+      });
+      return <button type="button" id={"bell-" + val} className={cName} key={"btn-bell" + val} data-value={val} onClick={this.setBellCount.bind(this)}>{label}</button>
     });
     var buttonGroup2 = BELL_VALUES.map((val, i) => {
       if (i < 4) { return; }
-      return <button type="button" id={"bell-" + val} className={"btn-bell bell" + val} key={"btn-bell" + val}>{val}</button>
+      var cName = classnames("btn-bell", "btn-bell" + val, {
+        "btn-bell-active": count === val
+      });
+      return <button type="button" id={"bell-" + val} className={cName} key={"btn-bell" + val} data-value={val} onClick={this.setBellCount.bind(this)}>{val}</button>
     });
     return (
       <p>
@@ -21,7 +30,9 @@ class BellSetting extends Component {
     );
   }
 
-  setBellCount (count) {
+  setBellCount (e) {
+    var target = e.currentTarget;
+    var count = +target.dataset.value;
     MetronomeActions.setBellCount(count);
   }
 };

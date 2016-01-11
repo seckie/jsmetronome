@@ -28,12 +28,12 @@ class BellIcons extends Component {
     });
     var icons = count <= 1 ? (
       <span className={cName} />
-    ): _.map(_.range(count), function (i) {
+    ): _.map(_.range(count), (i) => {
       var cName = classnames("bell-icon", {
         "bell-icon-top": i === 0,
         "bell-icon-active": i + 1 === beat && this.state.active
       });
-      return <span className={cName} />;
+      return <span className={cName} key={"bell-icon" + i} />;
     });
     return (
       <p className={"bell-icons bell-icons" + count}>{icons}</p>

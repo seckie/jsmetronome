@@ -18710,7 +18710,7 @@
 
 	var _componentsBellSettingJsx2 = _interopRequireDefault(_componentsBellSettingJsx);
 
-	var _componentsBellIconsJsx = __webpack_require__(175);
+	var _componentsBellIconsJsx = __webpack_require__(176);
 
 	var _componentsBellIconsJsx2 = _interopRequireDefault(_componentsBellIconsJsx);
 
@@ -25782,7 +25782,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _ConstantsJsx = __webpack_require__(174);
+	var _classnames = __webpack_require__(174);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _ConstantsJsx = __webpack_require__(175);
+
+	var _MetronomeActionsJsx = __webpack_require__(169);
+
+	var _MetronomeActionsJsx2 = _interopRequireDefault(_MetronomeActionsJsx);
 
 	var BellSetting = (function (_Component) {
 	  _inherits(BellSetting, _Component);
@@ -25796,14 +25804,20 @@
 	  _createClass(BellSetting, [{
 	    key: "render",
 	    value: function render() {
+	      var _this = this;
+
+	      var count = this.props.appState.bellCount;
 	      var buttonGroup1 = _ConstantsJsx.BELL_VALUES.map(function (val, i) {
 	        if (i > 3) {
 	          return;
 	        }
 	        var label = val === 0 ? "-" : val;
+	        var cName = (0, _classnames2["default"])("btn-bell", "btn-bell" + val, {
+	          "btn-bell-active": count === val
+	        });
 	        return _react2["default"].createElement(
 	          "button",
-	          { type: "button", id: "bell-" + val, className: "btn-bell bell" + val, key: "btn-bell" + val },
+	          { type: "button", id: "bell-" + val, className: cName, key: "btn-bell" + val, "data-value": val, onClick: _this.setBellCount.bind(_this) },
 	          label
 	        );
 	      });
@@ -25811,9 +25825,12 @@
 	        if (i < 4) {
 	          return;
 	        }
+	        var cName = (0, _classnames2["default"])("btn-bell", "btn-bell" + val, {
+	          "btn-bell-active": count === val
+	        });
 	        return _react2["default"].createElement(
 	          "button",
-	          { type: "button", id: "bell-" + val, className: "btn-bell bell" + val, key: "btn-bell" + val },
+	          { type: "button", id: "bell-" + val, className: cName, key: "btn-bell" + val, "data-value": val, onClick: _this.setBellCount.bind(_this) },
 	          val
 	        );
 	      });
@@ -25834,8 +25851,10 @@
 	    }
 	  }, {
 	    key: "setBellCount",
-	    value: function setBellCount(count) {
-	      MetronomeActions.setBellCount(count);
+	    value: function setBellCount(e) {
+	      var target = e.currentTarget;
+	      var count = +target.dataset.value;
+	      _MetronomeActionsJsx2["default"].setBellCount(count);
 	    }
 	  }]);
 
@@ -25849,6 +25868,60 @@
 
 /***/ },
 /* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
+
+/***/ },
+/* 175 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -25864,7 +25937,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 175 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25886,11 +25959,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _lodash = __webpack_require__(176);
+	var _lodash = __webpack_require__(177);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
-	var _classnames = __webpack_require__(178);
+	var _classnames = __webpack_require__(174);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -25923,6 +25996,8 @@
 	  }, {
 	    key: "render",
 	    value: function render() {
+	      var _this2 = this;
+
 	      var count = this.props.appState.bellCount;
 	      var beat = this.props.appState.beat;
 	      var cName = (0, _classnames2["default"])("bell-icon", {
@@ -25931,9 +26006,9 @@
 	      var icons = count <= 1 ? _react2["default"].createElement("span", { className: cName }) : _lodash2["default"].map(_lodash2["default"].range(count), function (i) {
 	        var cName = (0, _classnames2["default"])("bell-icon", {
 	          "bell-icon-top": i === 0,
-	          "bell-icon-active": i + 1 === beat && this.state.active
+	          "bell-icon-active": i + 1 === beat && _this2.state.active
 	        });
-	        return _react2["default"].createElement("span", { className: cName });
+	        return _react2["default"].createElement("span", { className: cName, key: "bell-icon" + i });
 	      });
 	      return _react2["default"].createElement(
 	        "p",
@@ -25952,7 +26027,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 176 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -38307,10 +38382,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(177)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(178)(module), (function() { return this; }())))
 
 /***/ },
-/* 177 */
+/* 178 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -38323,60 +38398,6 @@
 		}
 		return module;
 	}
-
-
-/***/ },
-/* 178 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2016 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	(function () {
-		'use strict';
-
-		var hasOwn = {}.hasOwnProperty;
-
-		function classNames () {
-			var classes = [];
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes.push(arg);
-				} else if (Array.isArray(arg)) {
-					classes.push(classNames.apply(null, arg));
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				}
-			}
-
-			return classes.join(' ');
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-			window.classNames = classNames;
-		}
-	}());
 
 
 /***/ },
@@ -38560,7 +38581,7 @@
 	          });
 	          break;
 	        case "setBellCount":
-	          return state.set("bellCount", action.bellCount);
+	          return state.set("bellCount", action.count);
 	          break;
 	        default:
 	          return state;
@@ -38599,7 +38620,7 @@
 
 	function getBeat(state) {
 	  var beat = state.get("beat") + 1;
-	  if (beat >= state.get("bellCount")) {
+	  if (beat > state.get("bellCount")) {
 	    beat = 1;
 	  }
 	  return beat;

@@ -67,7 +67,7 @@ class MetronomeStore extends MapStore {
         });
         break;
       case "setBellCount":
-        return state.set("bellCount",  action.bellCount);
+        return state.set("bellCount",  action.count);
         break;
       default:
         return state;
@@ -101,7 +101,7 @@ function getRange(tempo) {
 
 function getBeat(state) {
   var beat = state.get("beat") + 1;
-  if (beat >= state.get("bellCount")) {
+  if (beat > state.get("bellCount")) {
     beat = 1;
   }
   return beat;
