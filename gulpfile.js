@@ -3,10 +3,8 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var _ = require('lodash');
 
-var jade = require('gulp-jade');
 var stylus = require('gulp-stylus');
 var nib = require('nib');
-var coffee = require('gulp-coffee');
 var webpack = require('gulp-webpack');
 var jshint = require('gulp-jshint');
 
@@ -23,8 +21,6 @@ var browserSync = require('browser-sync').create();
 var PUBLIC_PATH = 'public/';
 
 var PATHS = {
-  jade: [ 'src/jade/*.jade' ],
-  jadeEntry: [ 'src/jade/**/!(_)*.jade' ],
   html: [ PUBLIC_PATH + '**/*.html' ],
   htmlDir: PUBLIC_PATH,
 
@@ -33,9 +29,6 @@ var PATHS = {
   js: [ PUBLIC_PATH + 'js/**/*.js' ],
   jsDir: PUBLIC_PATH + 'js',
   jsMain: PUBLIC_PATH + 'js/main.js',
-
-  coffee: [ 'src/coffee/**/*.coffee' ],
-  coffeeMain: './src/coffee/main.coffee',
 
   stylus: [ 'src/stylus/**/*.styl' ],
   stylusEntry: [ 'src/stylus/**/!(_)*.styl' ],
@@ -60,48 +53,6 @@ var errorHandler = function (e) {
   this.emit('end');
 };
 
-// build HTML
-var jadeLocalVar = {
-  build: false
-};
-var jadeData = {
-  items: require('./public/something.json')
-};
-gulp.task('jade-before-build', function (cb) {
-  jadeLocalVar.build = true;
-  return cb();
-});
-gulp.task('jade', function () {
-  return gulp.src(PATHS.jadeEntry)
-    .pipe(data(function (file) { return jadeData; }))
-    .pipe(jade({
-        pretty: true,
-        locals: jadeLocalVar
-      }).on('error', errorHandler))
-    .pipe(gulp.dest(PATHS.htmlDir));
-});
-gulp.task('jade-watch', function () {
-  return gulp.src(PATHS.jadeEntry)
-    .pipe(changed(PATHS.htmlDir), { extension: '.html' })
-    .pipe(data(function (file) { return jadeData; }))
-    .pipe(jade({
-        pretty: true,
-        locals: jadeLocalVar
-      }).on('error', errorHandler))
-    .pipe(gulp.dest(PATHS.htmlDir));
-});
-gulp.task('jade-deploy', function () {
-  return gulp.src(PATHS.jadeEntry)
-    .pipe(data(function (file) {
-      return _.assign(jadeData, { min: true });
-    }))
-    .pipe(jade({
-        pretty: false,
-        locals: jadeLocalVar
-      }).on('error', errorHandler))
-    .pipe(gulp.dest(PATHS.htmlDir));
-});
-
 // build CSS
 var stylusData = { use: [ nib() ] };
 gulp.task('stylus', function () {
@@ -113,12 +64,6 @@ gulp.task('stylus', function () {
 });
 
 // build JavaScript
-gulp.task('coffee', function () {
-  return gulp.src(PATHS.coffee)
-    .pipe(coffee().on('error', errorHandler))
-    .pipe(gulp.dest(PATHS.jsDir))
-    .pipe(browserSync.reload({ stream: true }));
-});
 gulp.task('jshint', function () {
   return gulp.src(PATHS.js)
     .pipe(jshint().on('error', errorHandler))
@@ -137,11 +82,7 @@ gulp.task('build', function () {
           extensions: [ '', '.js', '.jsx' ]
         }
       },
-      externals: {
-        'react': 'React',
-        'react/addons': 'React',
-        'immutable': 'Immutable',
-      }
+      externals: { 'react': 'React' }
     }))
     .pipe(gulp.dest(PATHS.jsDir))
     .pipe(browserSync.stream());
@@ -189,7 +130,7 @@ gulp.task('test', function (cb) {
 gulp.task('browser-sync', function () {
   browserSync.init({
     open: false,
-    //files: [ PATHS.css, PATHS.js, PATHS.jade ],
+    //files: [ PATHS.css, PATHS.js ],
     server: {
       baseDir: './public',
       middleware: [
@@ -212,13 +153,11 @@ gulp.task('browser-sync', function () {
 // watch
 gulp.task('watch', function () {
   gutil.log('start watching');
-  gulp.watch(PATHS.jade, [ 'jade-before-build', 'jade-watch' ])
-    .on('change', browserSync.reload);
+  gulp.watch(PATHS.html).on('change', browserSync.reload);
   gulp.watch(PATHS.stylus, [ 'stylus' ]);
   gulp.watch(PATHS.jsx, [ 'build' ]);
 });
 
 
 // commands
-gulp.task('default', [ 'browser-sync', 'stylus', 'jade-before-build', 'jade-watch', 'watch' ]);
-gulp.task('deploy', [ 'jade-before-build', 'jade-deploy', ]);
+gulp.task('default', [ 'browser-sync', 'stylus', 'watch' ]);
