@@ -34,6 +34,13 @@ class MetronomeApp extends Component {
     return state;
   }
 
+  componentWillMount () {
+    window.addEventListener("keyup", this.onKeyUp.bind(this), false);
+  }
+  componentWillUnmount () {
+    window.removeEventListener("keyup", this.onKeyUp.bind(this), false);
+  }
+
   render () {
     return (
       <div className="app">
@@ -45,6 +52,23 @@ class MetronomeApp extends Component {
         <SE appState={this.state} />
       </div>
     );
+  }
+
+  onKeyUp (e) {
+    console.log('keycode:', e.keyCode);
+    switch (e.keyCode) {
+      case 32:
+        this.togglePlaying();
+        break;
+    }
+  }
+
+  togglePlaying () {
+    if (this.state.playing) {
+      MetronomeActions.stop();
+    } else {
+      MetronomeActions.start();
+    }
   }
 };
 

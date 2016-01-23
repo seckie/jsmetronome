@@ -19729,6 +19729,16 @@
 	  }
 
 	  _createClass(MetronomeApp, [{
+	    key: "componentWillMount",
+	    value: function componentWillMount() {
+	      window.addEventListener("keyup", this.onKeyUp.bind(this), false);
+	    }
+	  }, {
+	    key: "componentWillUnmount",
+	    value: function componentWillUnmount() {
+	      window.removeEventListener("keyup", this.onKeyUp.bind(this), false);
+	    }
+	  }, {
 	    key: "render",
 	    value: function render() {
 	      return _react2["default"].createElement(
@@ -19741,6 +19751,25 @@
 	        _react2["default"].createElement(_componentsStartButtonJsx2["default"], { appState: this.state }),
 	        _react2["default"].createElement(_componentsSEJsx2["default"], { appState: this.state })
 	      );
+	    }
+	  }, {
+	    key: "onKeyUp",
+	    value: function onKeyUp(e) {
+	      console.log('keycode:', e.keyCode);
+	      switch (e.keyCode) {
+	        case 32:
+	          this.togglePlaying();
+	          break;
+	      }
+	    }
+	  }, {
+	    key: "togglePlaying",
+	    value: function togglePlaying() {
+	      if (this.state.playing) {
+	        _MetronomeActionsJsx2["default"].stop();
+	      } else {
+	        _MetronomeActionsJsx2["default"].start();
+	      }
 	    }
 	  }], [{
 	    key: "getStores",
