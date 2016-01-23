@@ -81,8 +81,7 @@ gulp.task('build', function () {
         resolve: {
           extensions: [ '', '.js', '.jsx' ]
         }
-      },
-      externals: { 'react': 'React' }
+      }
     }))
     .pipe(gulp.dest(PATHS.jsDir))
     .pipe(browserSync.stream());
