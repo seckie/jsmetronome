@@ -29,14 +29,16 @@ class MetronomeStore extends MapStore {
         });
         break;
       case "stop":
-        return state.set("playing", false);
+        return state.merge({
+          playing: false,
+          time: Date.now()
+        });
         break;
       case "tick":
         // TODO
         // Correct tempo interval (may cause by system performance)
         // through Date.now()
         var beat = getBeat(state);
-        console.log('beat:', beat);
         return state.merge({
           beat: beat,
           time: Date.now()
