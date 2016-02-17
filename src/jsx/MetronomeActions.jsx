@@ -17,6 +17,12 @@ const MetronomeActions = {
       type: "tick"
     });
   },
+  tempoUpdate (val) {
+    MetronomeDispatcher.dispatch({
+      type: "tempoUpdate",
+      tempo: val
+    });
+  },
   tempoUp () {
     MetronomeDispatcher.dispatch({
       type: "tempoUp"

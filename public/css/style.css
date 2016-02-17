@@ -139,8 +139,12 @@ img {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+input[type="text"].error {
+  background-color: #fcc;
+}
 .app {
   width: 300px;
+  padding: 20px;
   background: #d8d8d8;
   border: 3px solid #979797;
   -webkit-border-radius: 5px;

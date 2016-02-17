@@ -19681,11 +19681,11 @@
 
 	var _TempoValue2 = _interopRequireDefault(_TempoValue);
 
-	var _TempoSetting = __webpack_require__(179);
+	var _TempoSetting = __webpack_require__(184);
 
 	var _TempoSetting2 = _interopRequireDefault(_TempoSetting);
 
-	var _BellSetting = __webpack_require__(184);
+	var _BellSetting = __webpack_require__(185);
 
 	var _BellSetting2 = _interopRequireDefault(_BellSetting);
 
@@ -19705,7 +19705,7 @@
 
 	var _MetronomeStore2 = _interopRequireDefault(_MetronomeStore);
 
-	var _MetronomeActions = __webpack_require__(180);
+	var _MetronomeActions = __webpack_require__(179);
 
 	var _MetronomeActions2 = _interopRequireDefault(_MetronomeActions);
 
@@ -19758,6 +19758,7 @@
 	      console.log('keycode:', e.keyCode);
 	      switch (e.keyCode) {
 	        case 32:
+	          // <Space>
 	          this.togglePlaying();
 	          break;
 	      }
@@ -26322,6 +26323,14 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _MetronomeActions = __webpack_require__(179);
+
+	var _MetronomeActions2 = _interopRequireDefault(_MetronomeActions);
+
+	var _classnames = __webpack_require__(183);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -26343,11 +26352,22 @@
 	    key: "render",
 	    value: function render() {
 	      var appState = this.props.appState;
+	      var cName = (0, _classnames2.default)({
+	        tempo: true,
+	        error: appState.tempoError
+	      });
 	      return _react2.default.createElement(
 	        "p",
 	        null,
-	        _react2.default.createElement("input", { type: "text", value: appState.tempo, id: "tempo", className: "tempo", disabled: true })
+	        _react2.default.createElement("input", { type: "text", value: appState.viewTempo, id: "tempo", className: cName, onChange: this.onChange.bind(this) })
 	      );
+	    }
+	  }, {
+	    key: "onChange",
+	    value: function onChange(e) {
+	      var el = e.currentTarget;
+	      _MetronomeActions2.default.tempoUpdate(el.value);
+	      console.log("value:", el.value);
 	    }
 	  }]);
 
@@ -26368,103 +26388,11 @@
 
 	"use strict";
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _MetronomeActions = __webpack_require__(180);
-
-	var _MetronomeActions2 = _interopRequireDefault(_MetronomeActions);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var TempoSetting = function (_Component) {
-	  _inherits(TempoSetting, _Component);
-
-	  function TempoSetting() {
-	    _classCallCheck(this, TempoSetting);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(TempoSetting).apply(this, arguments));
-	  }
-
-	  _createClass(TempoSetting, [{
-	    key: "render",
-	    value: function render() {
-	      var appState = this.props.appState;
-	      var modeButton = appState.tradMode === true ? _react2.default.createElement(
-	        "button",
-	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-trad", onClick: this.setMode.bind(this) },
-	        "Trad"
-	      ) : _react2.default.createElement(
-	        "button",
-	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-one", onClick: this.setMode.bind(this) },
-	        "+- 1"
-	      );
-	      return _react2.default.createElement(
-	        "p",
-	        null,
-	        _react2.default.createElement(
-	          "button",
-	          { type: "button", id: "tempo-down", className: "btn-tempo down", onClick: this.decrement.bind(this) },
-	          "- ",
-	          appState.range
-	        ),
-	        modeButton,
-	        _react2.default.createElement(
-	          "button",
-	          { type: "button", id: "tempo-up", className: "btn-tempo up", onClick: this.increment.bind(this) },
-	          "+ ",
-	          appState.range
-	        )
-	      );
-	    }
-	  }, {
-	    key: "setMode",
-	    value: function setMode() {
-	      _MetronomeActions2.default.setTradMode(!this.props.appState.tradMode);
-	    }
-	  }, {
-	    key: "decrement",
-	    value: function decrement() {
-	      _MetronomeActions2.default.tempoDown();
-	    }
-	  }, {
-	    key: "increment",
-	    value: function increment() {
-	      _MetronomeActions2.default.tempoUp();
-	    }
-	  }]);
-
-	  return TempoSetting;
-	}(_react.Component);
-
-	;
-
-	exports.default = TempoSetting;
-
-/***/ },
-/* 180 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _MetronomeDispatcher = __webpack_require__(181);
+	var _MetronomeDispatcher = __webpack_require__(180);
 
 	var _MetronomeDispatcher2 = _interopRequireDefault(_MetronomeDispatcher);
 
@@ -26484,6 +26412,12 @@
 	  tick: function tick() {
 	    _MetronomeDispatcher2.default.dispatch({
 	      type: "tick"
+	    });
+	  },
+	  tempoUpdate: function tempoUpdate(val) {
+	    _MetronomeDispatcher2.default.dispatch({
+	      type: "tempoUpdate",
+	      tempo: val
 	    });
 	  },
 	  tempoUp: function tempoUp() {
@@ -26513,7 +26447,7 @@
 	exports.default = MetronomeActions;
 
 /***/ },
-/* 181 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -26522,13 +26456,13 @@
 	  value: true
 	});
 
-	var _flux = __webpack_require__(182);
+	var _flux = __webpack_require__(181);
 
 	var instance = new _flux.Dispatcher();
 	exports.default = instance;
 
 /***/ },
-/* 182 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -26540,11 +26474,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 
-	module.exports.Dispatcher = __webpack_require__(183);
+	module.exports.Dispatcher = __webpack_require__(182);
 
 
 /***/ },
-/* 183 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26781,6 +26715,60 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	(function () {
+		'use strict';
+
+		var hasOwn = {}.hasOwnProperty;
+
+		function classNames () {
+			var classes = [];
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes.push(arg);
+				} else if (Array.isArray(arg)) {
+					classes.push(classNames.apply(null, arg));
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes.push(key);
+						}
+					}
+				}
+			}
+
+			return classes.join(' ');
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	}());
+
+
+/***/ },
 /* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -26796,7 +26784,99 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(185);
+	var _MetronomeActions = __webpack_require__(179);
+
+	var _MetronomeActions2 = _interopRequireDefault(_MetronomeActions);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TempoSetting = function (_Component) {
+	  _inherits(TempoSetting, _Component);
+
+	  function TempoSetting() {
+	    _classCallCheck(this, TempoSetting);
+
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(TempoSetting).apply(this, arguments));
+	  }
+
+	  _createClass(TempoSetting, [{
+	    key: "render",
+	    value: function render() {
+	      var appState = this.props.appState;
+	      var modeButton = appState.tradMode === true ? _react2.default.createElement(
+	        "button",
+	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-trad", onClick: this.setMode.bind(this) },
+	        "Trad"
+	      ) : _react2.default.createElement(
+	        "button",
+	        { type: "button", id: "tempo-mode", className: "btn-tempo mode mode-one", onClick: this.setMode.bind(this) },
+	        "+- 1"
+	      );
+	      return _react2.default.createElement(
+	        "p",
+	        null,
+	        _react2.default.createElement(
+	          "button",
+	          { type: "button", id: "tempo-down", className: "btn-tempo down", onClick: this.decrement.bind(this) },
+	          "- ",
+	          appState.range
+	        ),
+	        modeButton,
+	        _react2.default.createElement(
+	          "button",
+	          { type: "button", id: "tempo-up", className: "btn-tempo up", onClick: this.increment.bind(this) },
+	          "+ ",
+	          appState.range
+	        )
+	      );
+	    }
+	  }, {
+	    key: "setMode",
+	    value: function setMode() {
+	      _MetronomeActions2.default.setTradMode(!this.props.appState.tradMode);
+	    }
+	  }, {
+	    key: "decrement",
+	    value: function decrement() {
+	      _MetronomeActions2.default.tempoDown();
+	    }
+	  }, {
+	    key: "increment",
+	    value: function increment() {
+	      _MetronomeActions2.default.tempoUp();
+	    }
+	  }]);
+
+	  return TempoSetting;
+	}(_react.Component);
+
+	;
+
+	exports.default = TempoSetting;
+
+/***/ },
+/* 185 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _classnames = __webpack_require__(183);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -26804,7 +26884,7 @@
 
 	var _Constants2 = _interopRequireDefault(_Constants);
 
-	var _MetronomeActions = __webpack_require__(180);
+	var _MetronomeActions = __webpack_require__(179);
 
 	var _MetronomeActions2 = _interopRequireDefault(_MetronomeActions);
 
@@ -26890,60 +26970,6 @@
 	exports.default = BellSetting;
 
 /***/ },
-/* 185 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2016 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	(function () {
-		'use strict';
-
-		var hasOwn = {}.hasOwnProperty;
-
-		function classNames () {
-			var classes = [];
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes.push(arg);
-				} else if (Array.isArray(arg)) {
-					classes.push(classNames.apply(null, arg));
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				}
-			}
-
-			return classes.join(' ');
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-			window.classNames = classNames;
-		}
-	}());
-
-
-/***/ },
 /* 186 */
 /***/ function(module, exports) {
 
@@ -26953,10 +26979,16 @@
 	  value: true
 	});
 	var Constants = {
-	  BELL_VALUES: [0, 2, 3, 4, 5, 6, 7, 8]
+	  BELL_VALUES: [0, 2, 3, 4, 5, 6, 7, 8],
+	  TEMPO_MIN: 1,
+	  TEMPO_MAX: 300,
+	  Messages: {
+	    TEMPO_VALUE_ERROR: "Invalid value of tempo!"
+	  }
 	};
 
 	exports.default = Constants;
+	var Messages = exports.Messages = Constants.Messages;
 
 /***/ },
 /* 187 */
@@ -26978,7 +27010,7 @@
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
-	var _classnames = __webpack_require__(185);
+	var _classnames = __webpack_require__(183);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -41495,7 +41527,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _MetronomeActions = __webpack_require__(180);
+	var _MetronomeActions = __webpack_require__(179);
 
 	var _MetronomeActions2 = _interopRequireDefault(_MetronomeActions);
 
@@ -41619,6 +41651,12 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	/**
+	 * - data validation
+	 * - error handling
+	 * - event handling
+	 * - store data
+	 */
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -41632,9 +41670,17 @@
 
 	var _utils = __webpack_require__(160);
 
-	var _MetronomeDispatcher = __webpack_require__(181);
+	var _MetronomeDispatcher = __webpack_require__(180);
 
 	var _MetronomeDispatcher2 = _interopRequireDefault(_MetronomeDispatcher);
+
+	var _ErrorHandler = __webpack_require__(194);
+
+	var _ErrorHandler2 = _interopRequireDefault(_ErrorHandler);
+
+	var _Constants = __webpack_require__(186);
+
+	var _Constants2 = _interopRequireDefault(_Constants);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -41659,6 +41705,8 @@
 	      return _immutable2.default.Map({
 	        playing: false,
 	        tempo: 100,
+	        viewTempo: 100,
+	        tempoError: false,
 	        range: 1,
 	        tradMode: false,
 	        bellCount: 0,
@@ -41696,13 +41744,38 @@
 	            time: Date.now()
 	          });
 	          break;
+	        case "tempoUpdate":
+	          var result;
+	          var newTempo = +action.tempo;
+	          if (_Constants2.default.TEMPO_MIN <= newTempo && newTempo <= _Constants2.default.TEMPO_MAX) {
+	            result = {
+	              tempo: newTempo,
+	              viewTempo: newTempo,
+	              tempoError: false,
+	              playing: false,
+	              time: Date.now()
+	            };
+	          } else {
+	            result = {
+	              tempoError: true,
+	              viewTempo: action.tempo,
+	              playing: false
+	            };
+	            (0, _ErrorHandler2.default)(_Constants.Messages.TEMPO_VALUE_ERROR);
+	          }
+	          return state.merge(result);
+	          break;
 	        case "tempoUp":
 	          var tradMode = state.get("tradMode");
 	          // TODO
 	          // if in "tradMode"
 	          // round next value to nearest trad value
 	          var range = tradMode ? getRange(tempo) : 1;
-	          return state.set("tempo", tempo + range);
+	          var result = {
+	            tempo: tempo + range,
+	            tempoError: false
+	          };
+	          return state.merge(result);
 	          break;
 	        case "tempoDown":
 	          var tradMode = state.get("tradMode");
@@ -41710,7 +41783,11 @@
 	          // if in "tradMode"
 	          // round next value to nearest trad value
 	          var range = tradMode ? getRange(tempo) : 1;
-	          return state.set("tempo", tempo - range);
+	          var result = {
+	            tempo: tempo - range,
+	            tempoError: false
+	          };
+	          return state.merge(result);
 	          break;
 	        case "setTradMode":
 	          var tradMode = action.tradMode;
@@ -41768,6 +41845,33 @@
 
 	var instance = new MetronomeStore(_MetronomeDispatcher2.default);
 	exports.default = instance;
+
+/***/ },
+/* 194 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	exports.default = function (err) {
+	  if (_lodash2.default.isObject(err) && err.message) {
+	    console.error(err.message);
+	  } else if (_lodash2.default.isString(err)) {
+	    console.error(err);
+	  }
+	  return;
+	};
+
+	var _lodash = __webpack_require__(188);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	;
 
 /***/ }
 /******/ ]);

@@ -58,7 +58,7 @@ class MetronomeApp extends Component {
   onKeyUp (e) {
     console.log('keycode:', e.keyCode);
     switch (e.keyCode) {
-      case 32:
+      case 32: // <Space>
         this.togglePlaying();
         break;
     }

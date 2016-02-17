@@ -1,14 +1,25 @@
 "use strict";
+/**
+ * - data validation
+ * - error handling
+ * - event handling
+ * - store data
+ */
+
 
 import Immutable from "immutable"
 import { MapStore } from "flux/utils";
 import MetronomeDispatcher from "./MetronomeDispatcher.jsx";
+import ErrorHandler from "./ErrorHandler.jsx";
+import Constants, { Messages } from "./Constants.jsx";
 
 class MetronomeStore extends MapStore {
   getInitialState (): State {
     return Immutable.Map({
       playing: false,
       tempo: 100,
+      viewTempo: 100,
+      tempoError: false,
       range: 1,
       tradMode: false,
       bellCount: 0,
@@ -44,13 +55,39 @@ class MetronomeStore extends MapStore {
           time: Date.now()
         });
         break;
+      case "tempoUpdate":
+        var result;
+        var newTempo = +action.tempo;
+        if (Constants.TEMPO_MIN <= newTempo &&
+          newTempo <= Constants.TEMPO_MAX) {
+          result = {
+            tempo: newTempo,
+            viewTempo: newTempo,
+            tempoError: false,
+            playing: false,
+            time: Date.now()
+          };
+        } else {
+          result = {
+            tempoError: true,
+            viewTempo: action.tempo,
+            playing: false
+          };
+          ErrorHandler(Messages.TEMPO_VALUE_ERROR);
+        }
+        return state.merge(result);
+        break;
       case "tempoUp":
         var tradMode = state.get("tradMode");
         // TODO
         // if in "tradMode"
         // round next value to nearest trad value
         var range = tradMode ? getRange(tempo) : 1;
-        return state.set("tempo", tempo + range);
+        var result = {
+          tempo: tempo + range,
+          tempoError: false
+        };
+        return state.merge(result);
         break;
       case "tempoDown":
         var tradMode = state.get("tradMode");
@@ -58,7 +95,11 @@ class MetronomeStore extends MapStore {
         // if in "tradMode"
         // round next value to nearest trad value
         var range = tradMode ? getRange(tempo) : 1;
-        return state.set("tempo", tempo - range);
+        var result = {
+          tempo: tempo - range,
+          tempoError: false
+        };
+        return state.merge(result);
         break;
       case "setTradMode":
         var tradMode = action.tradMode;
