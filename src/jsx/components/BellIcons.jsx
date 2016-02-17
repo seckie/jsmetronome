@@ -36,7 +36,7 @@ class BellIcons extends Component {
       return <span className={cName} key={"bell-icon" + i} />;
     });
     return (
-      <p className={"bell-icons bell-icons" + count}>{icons}</p>
+      <p className={"group-bell-icons bell-icons" + count}>{icons}</p>
     );
   }
 };

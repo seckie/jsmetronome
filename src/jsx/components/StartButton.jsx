@@ -7,7 +7,7 @@ class StartButton extends Component {
   render () {
     var label = this.props.appState.playing ? "Stop" : "Start";
     return (
-      <p>
+      <p className="group-start">
         <button type="button" id="toggle" className="btn-toggle" onClick={this.toggle.bind(this)}>{label}</button>
       </p>
     );

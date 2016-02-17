@@ -11,7 +11,7 @@ class TempoSetting extends Component {
       <button type="button" id="tempo-mode" className="btn-tempo mode mode-one" onClick={this.setMode.bind(this)}>+- 1</button>
     );
     return (
-      <p>
+      <p className="group-tempo">
       <button type="button" id="tempo-down" className="btn-tempo down" onClick={this.decrement.bind(this)}>
         - {appState.range}
       </button>

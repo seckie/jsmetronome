@@ -23,7 +23,7 @@ class BellSetting extends Component {
       return <button type="button" id={"bell-" + val} className={cName} key={"btn-bell" + val} data-value={val} onClick={this.setBellCount.bind(this)}>{val}</button>
     });
     return (
-      <p>
+      <p className="group-bell-setting">
         <span className="row">{buttonGroup1}</span>
         <span className="row">{buttonGroup2}</span>
       </p>

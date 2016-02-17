@@ -26820,7 +26820,7 @@
 	      );
 	      return _react2.default.createElement(
 	        "p",
-	        null,
+	        { className: "group-tempo" },
 	        _react2.default.createElement(
 	          "button",
 	          { type: "button", id: "tempo-down", className: "btn-tempo down", onClick: this.decrement.bind(this) },
@@ -26940,7 +26940,7 @@
 	      });
 	      return _react2.default.createElement(
 	        "p",
-	        null,
+	        { className: "group-bell-setting" },
 	        _react2.default.createElement(
 	          "span",
 	          { className: "row" },
@@ -27069,7 +27069,7 @@
 	      });
 	      return _react2.default.createElement(
 	        "p",
-	        { className: "bell-icons bell-icons" + count },
+	        { className: "group-bell-icons bell-icons" + count },
 	        icons
 	      );
 	    }
@@ -41554,7 +41554,7 @@
 	      var label = this.props.appState.playing ? "Stop" : "Start";
 	      return _react2.default.createElement(
 	        "p",
-	        null,
+	        { className: "group-start" },
 	        _react2.default.createElement(
 	          "button",
 	          { type: "button", id: "toggle", className: "btn-toggle", onClick: this.toggle.bind(this) },
@@ -41709,7 +41709,7 @@
 	        tempoError: false,
 	        range: 1,
 	        tradMode: false,
-	        bellCount: 0,
+	        bellCount: 4,
 	        beat: 1, // 1 <= beat <= bellCount
 	        time: Date.now(),
 	        interval: 0

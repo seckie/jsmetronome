@@ -22,7 +22,7 @@ class MetronomeStore extends MapStore {
       tempoError: false,
       range: 1,
       tradMode: false,
-      bellCount: 0,
+      bellCount: 4,
       beat: 1, // 1 <= beat <= bellCount
       time: Date.now(),
       interval: 0
