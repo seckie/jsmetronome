@@ -62,12 +62,13 @@ class MetronomeStore extends MapStore {
         var newTempo = +action.tempo;
         if (Constants.TEMPO_MIN <= newTempo &&
           newTempo <= Constants.TEMPO_MAX) {
+          var interval = 60 / newTempo * 1000;
           result = {
             tempo: newTempo,
             viewTempo: newTempo,
             tempoError: false,
-            playing: false,
-            time: Date.now()
+            clearTimer: true,
+            interval: interval
           };
         } else {
           result = {
@@ -85,12 +86,14 @@ class MetronomeStore extends MapStore {
         // if in "tradMode"
         // round next value to nearest trad value
         var range = tradMode ? getRange(tempo) : 1;
+        var newTempo = tempo + range;
+        var interval = 60 / newTempo * 1000;
         var result = {
-          tempo: tempo + range,
-          viewTempo:  tempo + range,
+          tempo: newTempo,
+          viewTempo:  newTempo,
           tempoError: false,
-          playing: false,
-          time: Date.now()
+          clearTimer: true,
+          interval: interval
         };
         return state.merge(result);
         break;
@@ -100,12 +103,14 @@ class MetronomeStore extends MapStore {
         // if in "tradMode"
         // round next value to nearest trad value
         var range = tradMode ? getRange(tempo) : 1;
+        var newTempo = tempo - range;
+        var interval = 60 / newTempo * 1000;
         var result = {
-          tempo: tempo - range,
-          viewTempo:  tempo - range,
+          tempo: newTempo,
+          viewTempo:  newTempo,
           tempoError: false,
-          playing: false,
-          time: Date.now()
+          clearTimer: true,
+          interval: interval
         };
         return state.merge(result);
         break;

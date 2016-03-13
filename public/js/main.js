@@ -41754,12 +41754,13 @@
 	          var result;
 	          var newTempo = +action.tempo;
 	          if (_Constants2.default.TEMPO_MIN <= newTempo && newTempo <= _Constants2.default.TEMPO_MAX) {
+	            var interval = 60 / newTempo * 1000;
 	            result = {
 	              tempo: newTempo,
 	              viewTempo: newTempo,
 	              tempoError: false,
-	              playing: false,
-	              time: Date.now()
+	              clearTimer: true,
+	              interval: interval
 	            };
 	          } else {
 	            result = {
@@ -41777,12 +41778,14 @@
 	          // if in "tradMode"
 	          // round next value to nearest trad value
 	          var range = tradMode ? getRange(tempo) : 1;
+	          var newTempo = tempo + range;
+	          var interval = 60 / newTempo * 1000;
 	          var result = {
-	            tempo: tempo + range,
-	            viewTempo: tempo + range,
+	            tempo: newTempo,
+	            viewTempo: newTempo,
 	            tempoError: false,
-	            playing: false,
-	            time: Date.now()
+	            clearTimer: true,
+	            interval: interval
 	          };
 	          return state.merge(result);
 	          break;
@@ -41792,12 +41795,14 @@
 	          // if in "tradMode"
 	          // round next value to nearest trad value
 	          var range = tradMode ? getRange(tempo) : 1;
+	          var newTempo = tempo - range;
+	          var interval = 60 / newTempo * 1000;
 	          var result = {
-	            tempo: tempo - range,
-	            viewTempo: tempo - range,
+	            tempo: newTempo,
+	            viewTempo: newTempo,
 	            tempoError: false,
-	            playing: false,
-	            time: Date.now()
+	            clearTimer: true,
+	            interval: interval
 	          };
 	          return state.merge(result);
 	          break;
