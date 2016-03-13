@@ -87,6 +87,7 @@ class MetronomeStore extends MapStore {
         var range = tradMode ? getRange(tempo) : 1;
         var result = {
           tempo: tempo + range,
+          viewTempo:  tempo + range,
           tempoError: false,
           playing: false,
           time: Date.now()
@@ -101,6 +102,7 @@ class MetronomeStore extends MapStore {
         var range = tradMode ? getRange(tempo) : 1;
         var result = {
           tempo: tempo - range,
+          viewTempo:  tempo - range,
           tempoError: false,
           playing: false,
           time: Date.now()

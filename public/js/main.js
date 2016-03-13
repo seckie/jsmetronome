@@ -41779,6 +41779,7 @@
 	          var range = tradMode ? getRange(tempo) : 1;
 	          var result = {
 	            tempo: tempo + range,
+	            viewTempo: tempo + range,
 	            tempoError: false,
 	            playing: false,
 	            time: Date.now()
@@ -41793,6 +41794,7 @@
 	          var range = tradMode ? getRange(tempo) : 1;
 	          var result = {
 	            tempo: tempo - range,
+	            viewTempo: tempo - range,
 	            tempoError: false,
 	            playing: false,
 	            time: Date.now()
