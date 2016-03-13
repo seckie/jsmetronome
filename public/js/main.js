@@ -19782,6 +19782,10 @@
 	    value: function calculateState(prevState) {
 	      var state = _MetronomeStore2.default.getState().toJS();
 	      console.log('state:', state);
+	      if (state.clearTimer && timer) {
+	        clearTimeout(timer);
+	        timer = null;
+	      }
 	      if (state.playing) {
 	        timer = setTimeout(function () {
 	          _MetronomeActions2.default.tick();
@@ -41703,6 +41707,7 @@
 	    key: "getInitialState",
 	    value: function getInitialState() {
 	      return _immutable2.default.Map({
+	        clearTimer: true,
 	        playing: false,
 	        tempo: 100,
 	        viewTempo: 100,
@@ -41741,6 +41746,7 @@
 	          var beat = getBeat(state);
 	          return state.merge({
 	            beat: beat,
+	            clearTimer: false,
 	            time: Date.now()
 	          });
 	          break;
@@ -41773,7 +41779,9 @@
 	          var range = tradMode ? getRange(tempo) : 1;
 	          var result = {
 	            tempo: tempo + range,
-	            tempoError: false
+	            tempoError: false,
+	            playing: false,
+	            time: Date.now()
 	          };
 	          return state.merge(result);
 	          break;
@@ -41785,7 +41793,9 @@
 	          var range = tradMode ? getRange(tempo) : 1;
 	          var result = {
 	            tempo: tempo - range,
-	            tempoError: false
+	            tempoError: false,
+	            playing: false,
+	            time: Date.now()
 	          };
 	          return state.merge(result);
 	          break;
@@ -41798,7 +41808,10 @@
 	          });
 	          break;
 	        case "setBellCount":
-	          return state.set("bellCount", action.count);
+	          return state.merge({
+	            bellCount: action.count,
+	            clearTimer: true
+	          });
 	          break;
 	        default:
 	          return state;

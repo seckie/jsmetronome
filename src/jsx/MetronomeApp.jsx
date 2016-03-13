@@ -22,14 +22,18 @@ class MetronomeApp extends Component {
   static calculateState (prevState): State {
     var state = MetronomeStore.getState().toJS();
     console.log('state:', state);
+    if (state.clearTimer && timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
     if (state.playing) {
       timer = setTimeout(() => {
         MetronomeActions.tick();
       }, state.interval);
     } else {
       if (timer) {
-       clearTimeout(timer);
-       timer = null;
+        clearTimeout(timer);
+        timer = null;
       }
     }
     return state;

@@ -16,6 +16,7 @@ import Constants, { Messages } from "./Constants.jsx";
 class MetronomeStore extends MapStore {
   getInitialState (): State {
     return Immutable.Map({
+      clearTimer: true,
       playing: false,
       tempo: 100,
       viewTempo: 100,
@@ -52,6 +53,7 @@ class MetronomeStore extends MapStore {
         var beat = getBeat(state);
         return state.merge({
           beat: beat,
+          clearTimer: false,
           time: Date.now()
         });
         break;
@@ -85,7 +87,9 @@ class MetronomeStore extends MapStore {
         var range = tradMode ? getRange(tempo) : 1;
         var result = {
           tempo: tempo + range,
-          tempoError: false
+          tempoError: false,
+          playing: false,
+          time: Date.now()
         };
         return state.merge(result);
         break;
@@ -97,7 +101,9 @@ class MetronomeStore extends MapStore {
         var range = tradMode ? getRange(tempo) : 1;
         var result = {
           tempo: tempo - range,
-          tempoError: false
+          tempoError: false,
+          playing: false,
+          time: Date.now()
         };
         return state.merge(result);
         break;
@@ -110,7 +116,10 @@ class MetronomeStore extends MapStore {
         });
         break;
       case "setBellCount":
-        return state.set("bellCount",  action.count);
+        return state.merge({
+          bellCount: action.count,
+          clearTimer: true
+        });
         break;
       default:
         return state;
