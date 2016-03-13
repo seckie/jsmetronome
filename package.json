@@ -1,6 +1,7 @@
 {
-  "name": "website-package",
-  "version": "0.0.0",
+  "name": "jsmetronome",
+  "version": "0.1.0",
+  "main": "main.js",
   "dependencies": {
     "classnames": "^2.2.3",
     "flux": "^2.1.1",
