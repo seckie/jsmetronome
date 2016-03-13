@@ -123,6 +123,7 @@ audio:not([controls]),
 }
 html {
   height: 100%;
+  background-color: transparent;
   font-family: "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Helvetica, Meiryo, "メイリオ", Osaka, 'ＭＳ Ｐゴシック', sans-serif;
   font-size: 10px;
   line-height: 1.5;
