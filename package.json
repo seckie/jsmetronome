@@ -1,7 +1,9 @@
 {
   "name": "jsmetronome",
   "version": "0.1.0",
-  "main": "main.js",
+  "main": "public/main.js",
+  "os": [ "darwin" ],
+  "cpu": [ "x64" ],
   "dependencies": {
     "classnames": "^2.2.3",
     "flux": "^2.1.1",
@@ -15,6 +17,7 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "browser-sync": "^2.11.1",
+    "electron-packager": "^5.2.1",
     "gmsmith": "^1.0.0",
     "gulp": "^3.9.0",
     "gulp-changed": "^1.3.0",

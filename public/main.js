@@ -23,7 +23,7 @@ app.on("ready", () => {
     frame: false,
     transparent: true
   });
-  mainWindow.loadURL("file://" + __dirname + "/public/index.html");
+  mainWindow.loadURL("file://" + __dirname + "/index.html");
   //mainWindow.webContents.openDevTools();
 
   mainWindow.on("closed", () => {
