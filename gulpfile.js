@@ -1,4 +1,6 @@
 'use strict';
+var exec = require('child_process').exec;
+
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var _ = require('lodash');
@@ -15,6 +17,9 @@ var data = require('gulp-data');
 var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
 var spritesmith = require('gulp.spritesmith');
+
+var packager = require('electron-packager');
+var packageJSON = require('./package.json');
 
 var browserSync = require('browser-sync').create();
 
@@ -39,7 +44,10 @@ var PATHS = {
   spriteImgName: [ 'main.png' ],
   spriteCSSName: [ 'sprite-main.styl' ],
   spriteImgDest: PUBLIC_PATH + 'img/sprite',
-  spriteCSSDest: 'src/stylus/sprite'
+  spriteCSSDest: 'src/stylus/sprite',
+
+  app: './',
+  release: 'release'
 };
 
 // utilities
@@ -148,6 +156,47 @@ gulp.task('browser-sync', function () {
     }
   });
 });
+
+// packager
+function open (platform, arch) {
+  var path =  PATHS.release + '/' + platform + '/' + 'JSMetronome-' + platform + '-' + arch + '/' + 'JSMetronome' + '.app';
+  return exec('open ' + path, (err, stdout, stderr) => {
+    if (err !== null) {
+      console.error('exec error: ' + err);
+    }
+  });
+}
+
+var platformArchMatrix = [];
+packageJSON.os.forEach((platform) => {
+  packageJSON.cpu.forEach((arch) => {
+    platformArchMatrix.push([ platform, arch ]);
+  });
+});
+
+gulp.task('pack', platformArchMatrix.map(function (platformArch) {
+  var taskName = 'pack:' + platformArch;
+  var platform = platformArch[0];
+  var arch = platformArch[1];
+  gulp.task(taskName, [ 'build' ], function (done) {
+    return packager({
+      arch: arch,
+      dir: PATHS.app,
+      name: packageJSON.name,
+      platform: platform,
+      out: PATHS.release + '/' + platform,
+      version: '0.37.2',
+      overwrite: true,
+      ignore: /(node_modules|karma.conf.js|LICENSE|src|tmp|test|README*|gulpfile.js|\.jshintrc|\.editorconfig|\.babelrc)/
+    }, function (err) {
+      open(platform, arch);
+      done();
+    });
+  });
+  return taskName;
+}));
+
+gulp.task('open', open);
 
 // watch
 gulp.task('watch', function () {
