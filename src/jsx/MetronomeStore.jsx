@@ -21,7 +21,7 @@ class MetronomeStore extends MapStore {
       tempo: 100,
       viewTempo: 100,
       tempoError: false,
-      range: 1,
+      markingIndex: Constants.DEFAULT_MARKING_INDEX,
       tradMode: false,
       bellCount: 4,
       beat: 1, // 1 <= beat <= bellCount
@@ -82,44 +82,40 @@ class MetronomeStore extends MapStore {
         break;
       case "tempoUp":
         var tradMode = state.get("tradMode");
-        // TODO
-        // if in "tradMode"
-        // round next value to nearest trad value
-        var range = tradMode ? getRange(tempo) : 1;
-        var newTempo = tempo + range;
+        var index = updateMarkingIndex(state.get("markingIndex") + 1);
+        var newTempo = tradMode ? Constants.MARKINGS[index] : tempo + 1;
         var interval = 60 / newTempo * 1000;
         var result = {
           tempo: newTempo,
           viewTempo:  newTempo,
           tempoError: false,
           clearTimer: true,
-          interval: interval
+          interval: interval,
+          markingIndex: index
         };
         return state.merge(result);
         break;
       case "tempoDown":
         var tradMode = state.get("tradMode");
-        // TODO
-        // if in "tradMode"
-        // round next value to nearest trad value
-        var range = tradMode ? getRange(tempo) : 1;
-        var newTempo = tempo - range;
+        var index = updateMarkingIndex(state.get("markingIndex") - 1);
+        var newTempo = tradMode ? Constants.MARKINGS[index] : tempo - 1;
         var interval = 60 / newTempo * 1000;
         var result = {
           tempo: newTempo,
           viewTempo:  newTempo,
           tempoError: false,
           clearTimer: true,
-          interval: interval
+          interval: interval,
+          markingIndex: index
         };
         return state.merge(result);
         break;
       case "setTradMode":
         var tradMode = action.tradMode;
-        var range = tradMode ? getRange(tempo) : 1;
+        var index = getMarkingIndexFromTempo(tempo);
         return state.merge({
           tradMode: action.tradMode,
-          range: range
+          markingIndex: index
         });
         break;
       case "setBellCount":
@@ -134,30 +130,20 @@ class MetronomeStore extends MapStore {
   }
 };
 
-function getRange(tempo) {
-  var range = 1;
-  switch (true) {
-    case (tempo < 60):
-      range = 2;
-      break;
-    case (60 < tempo && tempo <= 72):
-      range = 3;
-      break;
-    case (72 < tempo && tempo <= 120):
-      range = 4;
-      break;
-    case (120 < tempo && tempo <= 144):
-      range = 6;
-      break;
-    case (144 < tempo):
-      range = 8;
-      break;
-    default:
-      range = 1;
+function updateMarkingIndex(index) {
+  var markings = Constants.MARKINGS;
+  if (index >= markings.length) {
+    index = markings.length - 1;
+  } else if (index < 0) {
+    index = 0;
   }
-  return range;
+  return index;
 }
-
+function getMarkingIndexFromTempo(tempo) {
+  return _.findIndex(Constants.MARKINGS, (marking) => {
+    return tempo <= marking;
+  });
+}
 function getBeat(state) {
   var beat = state.get("beat") + 1;
   if (beat > state.get("bellCount")) {
