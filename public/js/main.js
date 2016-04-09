@@ -60,7 +60,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	window.addEventListener("load", function () {
+	window.addEventListener("DOMContentLoaded", function () {
 	  _reactDom2.default.render(_react2.default.createElement(_MetronomeApp2.default, null), document.getElementsByClassName("container")[0]);
 	}, false);
 
@@ -41626,7 +41626,7 @@
 	      if (nextProps.appState.playing) {
 	        var snare = this.refs.snare;
 	        var base = this.refs.base;
-	        var sound = nextProps.appState.beat === 1 ? snare : base;
+	        var sound = nextProps.appState.beat === 1 && nextProps.appState.bellCount > 1 ? snare : base;
 	        sound.currentTime = 0;
 	        sound.play();
 	      }

@@ -11,7 +11,8 @@ class SE extends Component {
     if (nextProps.appState.playing) {
       var snare = this.refs.snare;
       var base = this.refs.base;
-      var sound = (nextProps.appState.beat === 1) ? snare : base;
+      var sound = (nextProps.appState.beat === 1 &&
+        nextProps.appState.bellCount > 1) ? snare : base;
       sound.currentTime = 0;
       sound.play();
     }
