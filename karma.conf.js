@@ -1,4 +1,6 @@
 'use strict';
+var path = require('path');
+
 module.exports = function (config) {
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -10,9 +12,10 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      { pattern: "test/**/*.jsx", watched: false },
+      { pattern: "test/**/*.jsx" },
+      { pattern: "test/**/*.js" },
       'test/lib/*.js',
-      { pattern: "public/data/**/*.json", watched: false, included: false, served: true }
+      //{ pattern: "public/data/**/*.json", watched: false, included: false, served: true }
     ],
 
     // preprocess matching files before serving them to the browser
