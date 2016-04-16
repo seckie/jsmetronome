@@ -19709,6 +19709,10 @@
 
 	var _MetronomeActions2 = _interopRequireDefault(_MetronomeActions);
 
+	var _WorkerTimer = __webpack_require__(195);
+
+	var _WorkerTimer2 = _interopRequireDefault(_WorkerTimer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -19717,7 +19721,22 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var timer = undefined;
+	//var timer;
+	var blob = new Blob([_WorkerTimer2.default], { type: "text/javascript" });
+	var blobURL = window.URL.createObjectURL(blob);
+	var worker = new Worker(blobURL);
+
+	worker.addEventListener("message", function (e) {
+	  switch (e.data.type) {
+	    case "ready":
+	      break;
+	    case "tick":
+	      _MetronomeActions2.default.tick();
+	      break;
+	    case "end":
+	      break;
+	  }
+	}, false);
 
 	var MetronomeApp = function (_Component) {
 	  _inherits(MetronomeApp, _Component);
@@ -19782,18 +19801,16 @@
 	    value: function calculateState(prevState) {
 	      var state = _MetronomeStore2.default.getState().toJS();
 	      console.log('state:', state);
-	      if (state.clearTimer && timer) {
-	        clearTimeout(timer);
-	        timer = null;
-	      }
-	      if (state.playing) {
-	        timer = setTimeout(function () {
-	          _MetronomeActions2.default.tick();
-	        }, state.interval);
+	      if (state.clearTimer) {
+	        worker.postMessage({ type: "end" });
+	        if (state.playing === true) {
+	          worker.postMessage({ type: "start", interval: state.interval });
+	        }
 	      } else {
-	        if (timer) {
-	          clearTimeout(timer);
-	          timer = null;
+	        if (prevState && prevState.playing === false && state.playing === true) {
+	          worker.postMessage({ type: "start", interval: state.interval });
+	        } else if (prevState && prevState.playing === true && state.playing === false) {
+	          worker.postMessage({ type: "end", interval: state.interval });
 	        }
 	      }
 	      return state;
@@ -41880,6 +41897,39 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	;
+
+/***/ },
+/* 195 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var blob = "";
+	blob += 'var timer;';
+	blob += '';
+	blob += 'self.addEventListener("message", (e) => {';
+	blob += '  switch(e.data.type) {';
+	blob += '    case "ready":';
+	blob += '      self.postMessage({ type: "ready" });';
+	blob += '      break;';
+	blob += '    case "start":';
+	blob += '      timer = setInterval(() => {';
+	blob += '        self.postMessage({ type: "tick" });';
+	blob += '      }, e.data.interval || 1000);';
+	blob += '      break;';
+	blob += '    case "end":';
+	blob += '      self.postMessage({ type: "end" });';
+	blob += '      clearInterval(timer);';
+	blob += '      break;';
+	blob += '    default:';
+	blob += '      self.postMessage(e.data);';
+	blob += '  }';
+	blob += '}, false);';
+
+	exports.default = blob;
 
 /***/ }
 /******/ ]);
