@@ -185,7 +185,7 @@ gulp.task('pack', platformArchMatrix.map(function (platformArch) {
       name: packageJSON.name,
       platform: platform,
       out: PATHS.release + '/' + platform,
-      version: '0.37.2',
+      version: packageJSON.electronVersion,
       overwrite: true,
       ignore: /(node_modules|karma.conf.js|LICENSE|src|tmp|test|README*|gulpfile.js|\.jshintrc|\.editorconfig|\.babelrc)/
     }, function (err) {
