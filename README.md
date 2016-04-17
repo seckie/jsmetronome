@@ -4,7 +4,7 @@ JSMetronome is a metronome application for Mac OS.
 
 ## Download && Install
 
-Please download files from following releases and unzip the file.
+Please download files from following releases (JSMetronome-vX.X.X-darwin-x64.zip) and unzip the file.
 https://github.com/seckie/jsmetronome/releases
 
 ## Usage
