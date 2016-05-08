@@ -174,11 +174,20 @@ packageJSON.os.forEach((platform) => {
   });
 });
 
+gulp.task('icon', (done) => {
+  exec('iconutil -c icns ./src/icon.iconset --output ./public/img/icons/icon.icns', (err, stdout, stderr) => {
+    if (err !== null) {
+      console.error(err.message);
+    }
+    done();
+  });
+});
+
 gulp.task('pack', platformArchMatrix.map(function (platformArch) {
   var taskName = 'pack:' + platformArch;
   var platform = platformArch[0];
   var arch = platformArch[1];
-  gulp.task(taskName, [ 'build' ], function (done) {
+  gulp.task(taskName, [ 'build', 'icon' ], function (done) {
     return packager({
       arch: arch,
       dir: PATHS.app,
@@ -187,7 +196,8 @@ gulp.task('pack', platformArchMatrix.map(function (platformArch) {
       out: PATHS.release + '/' + platform,
       version: packageJSON.electronVersion,
       overwrite: true,
-      ignore: /(node_modules|karma.conf.js|LICENSE|src|tmp|test|README*|gulpfile.js|\.jshintrc|\.editorconfig|\.babelrc)/
+      ignore: /(node_modules|karma.conf.js|LICENSE|src|tmp|test|README*|gulpfile.js|\.jshintrc|\.editorconfig|\.babelrc)/,
+      icon: PATHS.app + 'public/img/icons/icon'
     }, function (err) {
       open(platform, arch);
       done();
