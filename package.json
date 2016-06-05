@@ -1,7 +1,7 @@
 {
   "name": "jsmetronome",
   "productName": "JSMetronome",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A metronome application for Mac OS",
   "license": "MIT",
   "electronVersion": "0.37.2",
