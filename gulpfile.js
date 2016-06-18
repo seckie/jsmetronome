@@ -20,6 +20,7 @@ var spritesmith = require('gulp.spritesmith');
 
 var packager = require('electron-packager');
 var packageJSON = require('./package.json');
+var codesign = require('electron-installer-codesign');
 
 var browserSync = require('browser-sync').create();
 
@@ -158,8 +159,7 @@ gulp.task('browser-sync', function () {
 });
 
 // packager
-function open (platform, arch) {
-  var path =  PATHS.release + '/' + platform + '/' + 'JSMetronome-' + platform + '-' + arch + '/' + 'JSMetronome' + '.app';
+function open (platform, path) {
   return exec('open ' + path, (err, stdout, stderr) => {
     if (err !== null) {
       console.error('exec error: ' + err);
@@ -197,16 +197,26 @@ gulp.task('pack', platformArchMatrix.map(function (platformArch) {
       version: packageJSON.electronVersion,
       overwrite: true,
       ignore: /(node_modules|karma.conf.js|LICENSE|src|tmp|test|README*|gulpfile.js|\.jshintrc|\.editorconfig|\.babelrc)/,
-      icon: PATHS.app + 'public/img/icons/icon'
+      icon: PATHS.app + 'public/img/icons/icon',
+      'app-bundle-id': 'jp.likealunatic.jsmetronome'
     }, function (err) {
-      open(platform, arch);
-      done();
+      var path =  PATHS.release + '/' + platform + '/' + 'jsmetronome-' + platform + '-' + arch + '/jsmetronome.app';
+      codesign({
+        appPath: path,
+        identity: 'Developer ID Application: Naoki Sekiguchi (VBA9P6YBC7)'
+      }, (err, filePath) => {
+        if (err) {
+          console.error(err.message);
+        }
+        console.log('filePath:', filePath);
+        open(platform, path);
+        done();
+      });
     });
   });
   return taskName;
 }));
 
-gulp.task('open', open);
 
 // watch
 gulp.task('watch', function () {
