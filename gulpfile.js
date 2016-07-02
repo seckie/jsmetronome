@@ -183,7 +183,7 @@ gulp.task('icon', (done) => {
   });
 });
 gulp.task('zip', (done) => {
-  exec('zip -r -y ./release/darwin/jsmetronome-darwin-x64/jsmetronome.zip ./release/darwin/jsmetronome-darwin-x64/jsmetronome.app', (err) => {
+  exec('cd ./release/darwin/jsmetronome-darwin-x64 && zip -r -y jsmetronome.zip jsmetronome.app', (err) => {
     if (err !== null) {
       console.error(err.message);
     }
