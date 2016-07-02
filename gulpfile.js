@@ -182,6 +182,14 @@ gulp.task('icon', (done) => {
     done();
   });
 });
+gulp.task('zip', (done) => {
+  exec('zip -r -y ./release/darwin/jsmetronome-darwin-x64/jsmetronome.zip ./release/darwin/jsmetronome-darwin-x64/jsmetronome.app', (err) => {
+    if (err !== null) {
+      console.error(err.message);
+    }
+    done();
+  });
+});
 
 gulp.task('pack', platformArchMatrix.map(function (platformArch) {
   var taskName = 'pack:' + platformArch;
