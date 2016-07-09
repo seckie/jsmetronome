@@ -21041,6 +21041,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	// Information from: http://stackoverflow.com/questions/34427446/bundle-error-using-webpack-for-electron-application-cannot-resolve-module-elec
+	var ipcRenderer = window.require("electron").ipcRenderer;
+
 	//var timer;
 	var blob = new Blob([_WorkerTimer2.default], { type: "text/javascript" });
 	var blobURL = window.URL.createObjectURL(blob);
@@ -21057,6 +21060,10 @@
 	      break;
 	  }
 	}, false);
+
+	ipcRenderer.on("complete-save-state", function (ev, arg) {
+	  console.log(arg);
+	});
 
 	var MetronomeApp = function (_Component) {
 	  _inherits(MetronomeApp, _Component);
@@ -21120,7 +21127,6 @@
 	    key: "calculateState",
 	    value: function calculateState(prevState) {
 	      var state = _MetronomeStore2.default.getState().toJS();
-	      console.log('state:', state);
 	      if (state.clearTimer) {
 	        worker.postMessage({ type: "end" });
 	        if (state.playing === true) {
@@ -21132,6 +21138,10 @@
 	        } else if (prevState && prevState.playing === true && state.playing === false) {
 	          worker.postMessage({ type: "end", interval: state.interval });
 	        }
+	      }
+	      // to save state
+	      if (prevState && state && (prevState.bellCount !== state.bellCount || prevState.tempo !== state.tempo || prevState.tradMode !== state.tradMode)) {
+	        ipcRenderer.send("save-state", state);
 	      }
 	      return state;
 	    }

@@ -28,7 +28,6 @@ var PUBLIC_PATH = 'public/';
 
 var PATHS = {
   html: [ PUBLIC_PATH + '**/*.html' ],
-  htmlDir: PUBLIC_PATH,
 
   jsx: [ 'src/jsx/**/*.jsx' ],
   jsxMain: './src/jsx/main.jsx',
