@@ -40,6 +40,13 @@ worker.addEventListener("message", (e) => {
 ipcRenderer.on("complete-save-state", (ev, arg) => {
   console.log(arg);
 });
+ipcRenderer.on("initialized", (ev, data) => {
+  console.log('data:', data);
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
+  MetronomeActions.save(data);
+});
 
 class MetronomeApp extends Component {
   static getStores (): Array {
@@ -70,6 +77,7 @@ class MetronomeApp extends Component {
   }
 
   componentWillMount () {
+    ipcRenderer.send("initialized");
     window.addEventListener("keyup", this.onKeyUp.bind(this), false);
   }
   componentWillUnmount () {

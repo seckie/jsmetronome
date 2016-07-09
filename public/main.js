@@ -1,7 +1,7 @@
 "use strict";
 
 const {app, BrowserWindow, ipcMain} = require("electron");
-const userDataPath = app.getPath("userData");
+const settingsJSONPath = app.getPath("userData") + "/settings.json";
 const fs = require("fs");
 
 var mainWindow = null;
@@ -25,21 +25,26 @@ app.on("ready", () => {
   });
   mainWindow.loadURL("file://" + __dirname + "/index.html");
   mainWindow.webContents.openDevTools();
-
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
 });
 
-ipcMain.on("save-state", (event, arg) => {
-  console.log(userDataPath);
+ipcMain.on("initialized", (event) => {
+  fs.readFile(settingsJSONPath, { encoding: "utf8" }, (err, data) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    event.sender.send("initialized", data);
+  });
+});
 
+ipcMain.on("save-state", (event, arg) => {
   var data = JSON.stringify(arg);
-  fs.writeFile(userDataPath + "/settings.json", data, (err) => {
+  fs.writeFile(settingsJSONPath, data, (err) => {
     if (err) {
       console.error(err.message);
     }
   });
-
   event.sender.send("complete-save-state");
 });

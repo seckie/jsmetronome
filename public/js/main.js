@@ -21064,6 +21064,13 @@
 	ipcRenderer.on("complete-save-state", function (ev, arg) {
 	  console.log(arg);
 	});
+	ipcRenderer.on("initialized", function (ev, data) {
+	  console.log('data:', data);
+	  if (typeof data === "string") {
+	    data = JSON.parse(data);
+	  }
+	  _MetronomeActions2.default.save(data);
+	});
 
 	var MetronomeApp = function (_Component) {
 	  _inherits(MetronomeApp, _Component);
@@ -21077,6 +21084,7 @@
 	  _createClass(MetronomeApp, [{
 	    key: "componentWillMount",
 	    value: function componentWillMount() {
+	      ipcRenderer.send("initialized");
 	      window.addEventListener("keyup", this.onKeyUp.bind(this), false);
 	    }
 	  }, {
@@ -27745,6 +27753,13 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var MetronomeActions = {
+	  save: function save(settings) {
+	    // send all state
+	    _MetronomeDispatcher2.default.dispatch({
+	      type: "save",
+	      settings: settings
+	    });
+	  },
 	  start: function start() {
 	    _MetronomeDispatcher2.default.dispatch({
 	      type: "start"
@@ -45051,15 +45066,17 @@
 	      return _immutable2.default.Map({
 	        clearTimer: true,
 	        playing: false,
-	        tempo: 100,
 	        viewTempo: 100,
 	        tempoError: false,
 	        markingIndex: _Constants2.default.DEFAULT_MARKING_INDEX,
-	        tradMode: false,
-	        bellCount: 4,
 	        beat: 1, // 1 <= beat <= bellCount
 	        time: Date.now(),
-	        interval: 0
+	        interval: 0,
+
+	        // settings
+	        bellCount: 4,
+	        tempo: 100,
+	        tradMode: false
 	      });
 	    }
 	  }, {
@@ -45067,6 +45084,17 @@
 	    value: function reduce(state, action) {
 	      var tempo = state.get("tempo");
 	      switch (action.type) {
+	        case "save":
+	          var index = getMarkingIndexFromTempo(action.settings.tempo);
+	          return state.merge({
+	            bellCount: action.settings.bellCount,
+	            tempo: action.settings.tempo,
+	            tradMode: action.settings.tradMode,
+
+	            viewTempo: action.settings.tempo,
+	            markingIndex: index
+	          });
+	          break;
 	        case "start":
 	          var interval = 60 / tempo * 1000;
 	          return state.merge({

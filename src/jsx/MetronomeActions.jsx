@@ -2,6 +2,13 @@
 import MetronomeDispatcher from "./MetronomeDispatcher.jsx";
 
 const MetronomeActions = {
+  save (settings) {
+    // send all state
+    MetronomeDispatcher.dispatch({
+      type: "save",
+      settings: settings
+    });
+  },
   start () {
     MetronomeDispatcher.dispatch({
       type: "start"
