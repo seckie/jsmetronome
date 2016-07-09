@@ -14,17 +14,17 @@ app.on("window-all-closed", () => {
 
 app.on("ready", () => {
   mainWindow = new BrowserWindow({
-//    width: 300,
-//    height: 328,
-    width: 1200,
-    height: 728,
-    //resizable: false,
+    width: 300,
+    height: 328,
+//    width: 1200,
+//    height: 728,
+    resizable: false,
     title: "JSMetronome",
-    //frame: false,
-    //transparent: true
+    frame: false,
+    transparent: true
   });
   mainWindow.loadURL("file://" + __dirname + "/index.html");
-  mainWindow.webContents.openDevTools();
+//  mainWindow.webContents.openDevTools();
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
