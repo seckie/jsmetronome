@@ -18,20 +18,33 @@ class MetronomeStore extends MapStore {
     return Immutable.Map({
       clearTimer: true,
       playing: false,
-      tempo: 100,
       viewTempo: 100,
       tempoError: false,
       markingIndex: Constants.DEFAULT_MARKING_INDEX,
-      tradMode: false,
-      bellCount: 4,
       beat: 1, // 1 <= beat <= bellCount
       time: Date.now(),
-      interval: 0
+      interval: 0,
+
+      // settings
+      bellCount: 4,
+      tempo: 100,
+      tradMode: false
     });
   }
   reduce (state: State, action: Object): State {
     var tempo = state.get("tempo");
     switch (action.type) {
+      case "save":
+        var index = getMarkingIndexFromTempo(action.settings.tempo);
+        return state.merge({
+          bellCount: action.settings.bellCount,
+          tempo: action.settings.tempo,
+          tradMode: action.settings.tradMode,
+
+          viewTempo: action.settings.tempo,
+          markingIndex: index
+        });
+        break;
       case "start":
         var interval = 60 / tempo * 1000;
         return state.merge({

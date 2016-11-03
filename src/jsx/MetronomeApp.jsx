@@ -2,6 +2,8 @@
 
 import React, { Component } from "react";
 import { Container } from "flux/utils";
+// Information from: http://stackoverflow.com/questions/34427446/bundle-error-using-webpack-for-electron-application-cannot-resolve-module-elec
+const ipcRenderer = window.require("electron").ipcRenderer;
 
 import TempoValue from "./components/TempoValue.jsx";
 import TempoSetting from "./components/TempoSetting.jsx";
@@ -34,13 +36,24 @@ worker.addEventListener("message", (e) => {
   }
 }, false);
 
+
+ipcRenderer.on("complete-save-state", (ev, arg) => {
+  console.log(arg);
+});
+ipcRenderer.on("initialized", (ev, data) => {
+  console.log('data:', data);
+  if (typeof data === "string") {
+    data = JSON.parse(data);
+  }
+  MetronomeActions.save(data);
+});
+
 class MetronomeApp extends Component {
   static getStores (): Array {
     return [ MetronomeStore ];
   }
   static calculateState (prevState): State {
     var state = MetronomeStore.getState().toJS();
-    console.log('state:', state);
     if (state.clearTimer) {
       worker.postMessage({ type: "end" });
       if (state.playing === true) {
@@ -53,10 +66,18 @@ class MetronomeApp extends Component {
         worker.postMessage({ type: "end", interval: state.interval });
       }
     }
+    // to save state
+    if (prevState && state &&
+      (prevState.bellCount !== state.bellCount ||
+      prevState.tempo !== state.tempo ||
+      prevState.tradMode !== state.tradMode)) {
+      ipcRenderer.send("save-state", state);
+    }
     return state;
   }
 
   componentWillMount () {
+    ipcRenderer.send("initialized");
     window.addEventListener("keyup", this.onKeyUp.bind(this), false);
   }
   componentWillUnmount () {

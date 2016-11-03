@@ -21041,6 +21041,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	// Information from: http://stackoverflow.com/questions/34427446/bundle-error-using-webpack-for-electron-application-cannot-resolve-module-elec
+	var ipcRenderer = window.require("electron").ipcRenderer;
+
 	//var timer;
 	var blob = new Blob([_WorkerTimer2.default], { type: "text/javascript" });
 	var blobURL = window.URL.createObjectURL(blob);
@@ -21058,6 +21061,17 @@
 	  }
 	}, false);
 
+	ipcRenderer.on("complete-save-state", function (ev, arg) {
+	  console.log(arg);
+	});
+	ipcRenderer.on("initialized", function (ev, data) {
+	  console.log('data:', data);
+	  if (typeof data === "string") {
+	    data = JSON.parse(data);
+	  }
+	  _MetronomeActions2.default.save(data);
+	});
+
 	var MetronomeApp = function (_Component) {
 	  _inherits(MetronomeApp, _Component);
 
@@ -21070,6 +21084,7 @@
 	  _createClass(MetronomeApp, [{
 	    key: "componentWillMount",
 	    value: function componentWillMount() {
+	      ipcRenderer.send("initialized");
 	      window.addEventListener("keyup", this.onKeyUp.bind(this), false);
 	    }
 	  }, {
@@ -21120,7 +21135,6 @@
 	    key: "calculateState",
 	    value: function calculateState(prevState) {
 	      var state = _MetronomeStore2.default.getState().toJS();
-	      console.log('state:', state);
 	      if (state.clearTimer) {
 	        worker.postMessage({ type: "end" });
 	        if (state.playing === true) {
@@ -21132,6 +21146,10 @@
 	        } else if (prevState && prevState.playing === true && state.playing === false) {
 	          worker.postMessage({ type: "end", interval: state.interval });
 	        }
+	      }
+	      // to save state
+	      if (prevState && state && (prevState.bellCount !== state.bellCount || prevState.tempo !== state.tempo || prevState.tradMode !== state.tradMode)) {
+	        ipcRenderer.send("save-state", state);
 	      }
 	      return state;
 	    }
@@ -27735,6 +27753,13 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var MetronomeActions = {
+	  save: function save(settings) {
+	    // send all state
+	    _MetronomeDispatcher2.default.dispatch({
+	      type: "save",
+	      settings: settings
+	    });
+	  },
 	  start: function start() {
 	    _MetronomeDispatcher2.default.dispatch({
 	      type: "start"
@@ -45041,15 +45066,17 @@
 	      return _immutable2.default.Map({
 	        clearTimer: true,
 	        playing: false,
-	        tempo: 100,
 	        viewTempo: 100,
 	        tempoError: false,
 	        markingIndex: _Constants2.default.DEFAULT_MARKING_INDEX,
-	        tradMode: false,
-	        bellCount: 4,
 	        beat: 1, // 1 <= beat <= bellCount
 	        time: Date.now(),
-	        interval: 0
+	        interval: 0,
+
+	        // settings
+	        bellCount: 4,
+	        tempo: 100,
+	        tradMode: false
 	      });
 	    }
 	  }, {
@@ -45057,6 +45084,17 @@
 	    value: function reduce(state, action) {
 	      var tempo = state.get("tempo");
 	      switch (action.type) {
+	        case "save":
+	          var index = getMarkingIndexFromTempo(action.settings.tempo);
+	          return state.merge({
+	            bellCount: action.settings.bellCount,
+	            tempo: action.settings.tempo,
+	            tradMode: action.settings.tradMode,
+
+	            viewTempo: action.settings.tempo,
+	            markingIndex: index
+	          });
+	          break;
 	        case "start":
 	          var interval = 60 / tempo * 1000;
 	          return state.merge({
