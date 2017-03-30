@@ -10,7 +10,7 @@
 import Immutable from "immutable"
 import { MapStore } from "flux/utils";
 import MetronomeDispatcher from "./MetronomeDispatcher.jsx";
-import ErrorHandler from "./ErrorHandler.jsx";
+import errorHandler from "./utils/errorHandler.jsx";
 import Constants, { Messages } from "./Constants.jsx";
 
 class MetronomeStore extends MapStore {
@@ -89,7 +89,7 @@ class MetronomeStore extends MapStore {
             viewTempo: action.tempo,
             playing: false
           };
-          ErrorHandler(Messages.TEMPO_VALUE_ERROR);
+          errorHandler(Messages.TEMPO_VALUE_ERROR);
         }
         return state.merge(result);
         break;
