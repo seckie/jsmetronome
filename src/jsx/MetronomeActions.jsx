@@ -1,53 +1,58 @@
 "use strict";
-import MetronomeDispatcher from "./MetronomeDispatcher.jsx";
+import { dispatch }  from "./MetronomeDispatcher.jsx";
 
 const MetronomeActions = {
   save (settings) {
     // send all state
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "save",
       settings: settings
     });
   },
   start () {
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "start"
     });
   },
   stop () {
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "stop"
     });
   },
   tick () {
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "tick"
     });
   },
+  draw () {
+    dispatch({
+    });
+  },
+
   tempoUpdate (val) {
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "tempoUpdate",
       tempo: val
     });
   },
   tempoUp () {
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "tempoUp"
     });
   },
   tempoDown () {
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "tempoDown"
     });
   },
   setTradMode (tradMode: Boolean) {
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "setTradMode",
       tradMode: tradMode
     });
   },
   setBellCount (count: Number) {
-    MetronomeDispatcher.dispatch({
+    dispatch({
       type: "setBellCount",
       count: count
     });
