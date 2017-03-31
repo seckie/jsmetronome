@@ -9,7 +9,7 @@ class BellSetting extends Component {
     var count = this.props.appState.bellCount;
     var buttonGroup1 = Constants.BELL_VALUES.map((val, i) => {
       if (i > 3) { return; }
-      var label = val === 0 ? "-" : val;
+      var label = val === 1 ? "-" : val;
       var cName = classnames("btn-bell", "btn-bell" + val, {
         "btn-bell-active": count === val
       });
