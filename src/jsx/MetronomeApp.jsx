@@ -10,13 +10,12 @@ import TempoSetting from "./components/TempoSetting.jsx";
 import BellSetting from "./components/BellSetting.jsx";
 import BellIcons from "./components/BellIcons.jsx";
 import StartButton from "./components/StartButton.jsx";
-import SE from "./components/SE.jsx";
 
 import MetronomeStore from "./MetronomeStore.jsx";
 import MetronomeActions from "./MetronomeActions.jsx";
 import WorkerTimer from "./utils/WorkerTimer.jsx";
+import Constants from "./Constants.jsx";
 
-//var timer;
 var blob = new Blob(
   [ WorkerTimer ],
   { type: "text/javascript" }
@@ -24,14 +23,16 @@ var blob = new Blob(
 var blobURL = window.URL.createObjectURL(blob);
 var worker = new Worker(blobURL);
 
+var audioContext = new AudioContext();
+
 worker.addEventListener("message", (e) => {
   switch(e.data.type) {
     case "ready":
       break;
     case "tick":
-      MetronomeActions.tick();
+      MetronomeActions.tick(audioContext);
       break;
-    case "end":
+    case "stop":
       break;
   }
 }, false);
@@ -53,17 +54,27 @@ class MetronomeApp extends Component {
     return [ MetronomeStore ];
   }
   static calculateState (prevState): State {
-    var state = MetronomeStore.getState().toJS();
+    const state = MetronomeStore.getState().toJS();
     if (state.clearTimer) {
-      worker.postMessage({ type: "end" });
+      worker.postMessage({
+        type: "stop"
+      });
       if (state.playing === true) {
-        worker.postMessage({ type: "start", interval: state.interval });
+        worker.postMessage({
+          type: "start",
+          interval: Constants.TICK_INTERVAL
+        });
       }
-    } else {
-      if (prevState && prevState.playing === false && state.playing === true) {
-        worker.postMessage({ type: "start", interval: state.interval });
-      } else if (prevState && prevState.playing === true && state.playing === false) {
-        worker.postMessage({ type: "end", interval: state.interval });
+    } else if (prevState) {
+      if (prevState.playing === false && state.playing === true) {
+        worker.postMessage({
+          type: "start",
+          interval: Constants.TICK_INTERVAL
+        });
+      } else if (prevState.playing === true && state.playing === false) {
+        worker.postMessage({
+          type: "stop"
+        });
       }
     }
     // to save state
@@ -78,11 +89,13 @@ class MetronomeApp extends Component {
 
   componentWillMount () {
     ipcRenderer.send("initialized");
+    MetronomeActions.init(audioContext);
     window.addEventListener("keyup", this.onKeyUp.bind(this), false);
   }
   componentWillUnmount () {
     window.removeEventListener("keyup", this.onKeyUp.bind(this), false);
   }
+
 
   render () {
     return (
@@ -92,13 +105,12 @@ class MetronomeApp extends Component {
         <BellSetting appState={this.state} />
         <BellIcons appState={this.state} />
         <StartButton appState={this.state} />
-        <SE appState={this.state} />
       </div>
     );
   }
 
   onKeyUp (e) {
-    console.log('keycode:', e.keyCode);
+    //console.log('keycode:', e.keyCode);
     switch (e.keyCode) {
       case 32: // <Space>
         this.togglePlaying();

@@ -6,6 +6,9 @@ const Constants = {
   DEFAULT_MARKING_INDEX: 16,
   TEMPO_MIN: 1,
   TEMPO_MAX: 300,
+  SCHEDULE_AHEAD_TIME: 0.1, // (sec)
+  NOTE_LENGTH: 0.5, // (sec)
+  TICK_INTERVAL: 100, // (msec)
   Messages: {
     TEMPO_VALUE_ERROR: "Invalid value of tempo!"
   }

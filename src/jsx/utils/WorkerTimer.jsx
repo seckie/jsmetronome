@@ -2,7 +2,7 @@
 
 var blob = "";
 blob += 'var timer;';
-blob += '';
+
 blob += 'self.addEventListener("message", (e) => {';
 blob += '  switch(e.data.type) {';
 blob += '    case "ready":';
@@ -11,10 +11,10 @@ blob += '      break;';
 blob += '    case "start":';
 blob += '      timer = setInterval(() => {';
 blob += '        self.postMessage({ type: "tick" });';
-blob += '      }, e.data.interval || 1000);';
+blob += '      }, e.data.interval || 100);';
 blob += '      break;';
-blob += '    case "end":';
-blob += '      self.postMessage({ type: "end" });';
+blob += '    case "stop":';
+blob += '      self.postMessage({ type: "stop" });';
 blob += '      clearInterval(timer);';
 blob += '      break;';
 blob += '    default:';

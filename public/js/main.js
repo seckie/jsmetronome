@@ -21017,11 +21017,7 @@
 
 	var _StartButton2 = _interopRequireDefault(_StartButton);
 
-	var _SE = __webpack_require__(202);
-
-	var _SE2 = _interopRequireDefault(_SE);
-
-	var _MetronomeStore = __webpack_require__(203);
+	var _MetronomeStore = __webpack_require__(202);
 
 	var _MetronomeStore2 = _interopRequireDefault(_MetronomeStore);
 
@@ -21032,6 +21028,10 @@
 	var _WorkerTimer = __webpack_require__(205);
 
 	var _WorkerTimer2 = _interopRequireDefault(_WorkerTimer);
+
+	var _Constants = __webpack_require__(197);
+
+	var _Constants2 = _interopRequireDefault(_Constants);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21044,19 +21044,20 @@
 	// Information from: http://stackoverflow.com/questions/34427446/bundle-error-using-webpack-for-electron-application-cannot-resolve-module-elec
 	var ipcRenderer = window.require("electron").ipcRenderer;
 
-	//var timer;
 	var blob = new Blob([_WorkerTimer2.default], { type: "text/javascript" });
 	var blobURL = window.URL.createObjectURL(blob);
 	var worker = new Worker(blobURL);
+
+	var audioContext = new AudioContext();
 
 	worker.addEventListener("message", function (e) {
 	  switch (e.data.type) {
 	    case "ready":
 	      break;
 	    case "tick":
-	      _MetronomeActions2.default.tick();
+	      _MetronomeActions2.default.tick(audioContext);
 	      break;
-	    case "end":
+	    case "stop":
 	      break;
 	  }
 	}, false);
@@ -21085,6 +21086,7 @@
 	    key: "componentWillMount",
 	    value: function componentWillMount() {
 	      ipcRenderer.send("initialized");
+	      _MetronomeActions2.default.init(audioContext);
 	      window.addEventListener("keyup", this.onKeyUp.bind(this), false);
 	    }
 	  }, {
@@ -21102,14 +21104,13 @@
 	        _react2.default.createElement(_TempoSetting2.default, { appState: this.state }),
 	        _react2.default.createElement(_BellSetting2.default, { appState: this.state }),
 	        _react2.default.createElement(_BellIcons2.default, { appState: this.state }),
-	        _react2.default.createElement(_StartButton2.default, { appState: this.state }),
-	        _react2.default.createElement(_SE2.default, { appState: this.state })
+	        _react2.default.createElement(_StartButton2.default, { appState: this.state })
 	      );
 	    }
 	  }, {
 	    key: "onKeyUp",
 	    value: function onKeyUp(e) {
-	      console.log('keycode:', e.keyCode);
+	      //console.log('keycode:', e.keyCode);
 	      switch (e.keyCode) {
 	        case 32:
 	          // <Space>
@@ -21136,15 +21137,25 @@
 	    value: function calculateState(prevState) {
 	      var state = _MetronomeStore2.default.getState().toJS();
 	      if (state.clearTimer) {
-	        worker.postMessage({ type: "end" });
+	        worker.postMessage({
+	          type: "stop"
+	        });
 	        if (state.playing === true) {
-	          worker.postMessage({ type: "start", interval: state.interval });
+	          worker.postMessage({
+	            type: "start",
+	            interval: _Constants2.default.TICK_INTERVAL
+	          });
 	        }
-	      } else {
-	        if (prevState && prevState.playing === false && state.playing === true) {
-	          worker.postMessage({ type: "start", interval: state.interval });
-	        } else if (prevState && prevState.playing === true && state.playing === false) {
-	          worker.postMessage({ type: "end", interval: state.interval });
+	      } else if (prevState) {
+	        if (prevState.playing === false && state.playing === true) {
+	          worker.postMessage({
+	            type: "start",
+	            interval: _Constants2.default.TICK_INTERVAL
+	          });
+	        } else if (prevState.playing === true && state.playing === false) {
+	          worker.postMessage({
+	            type: "stop"
+	          });
 	        }
 	      }
 	      // to save state
@@ -27748,57 +27759,60 @@
 
 	var _MetronomeDispatcher = __webpack_require__(191);
 
-	var _MetronomeDispatcher2 = _interopRequireDefault(_MetronomeDispatcher);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 	var MetronomeActions = {
+	  init: function init(audioContext) {
+	    (0, _MetronomeDispatcher.dispatch)({
+	      type: "init",
+	      audioContext: audioContext
+	    });
+	  },
 	  save: function save(settings) {
 	    // send all state
-	    _MetronomeDispatcher2.default.dispatch({
+	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "save",
 	      settings: settings
 	    });
 	  },
 	  start: function start() {
-	    _MetronomeDispatcher2.default.dispatch({
+	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "start"
 	    });
 	  },
 	  stop: function stop() {
-	    _MetronomeDispatcher2.default.dispatch({
+	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "stop"
 	    });
 	  },
-	  tick: function tick() {
-	    _MetronomeDispatcher2.default.dispatch({
-	      type: "tick"
+	  tick: function tick(audioContext) {
+	    (0, _MetronomeDispatcher.dispatch)({
+	      type: "tick",
+	      audioContext: audioContext
 	    });
 	  },
 	  tempoUpdate: function tempoUpdate(val) {
-	    _MetronomeDispatcher2.default.dispatch({
+	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "tempoUpdate",
 	      tempo: val
 	    });
 	  },
 	  tempoUp: function tempoUp() {
-	    _MetronomeDispatcher2.default.dispatch({
+	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "tempoUp"
 	    });
 	  },
 	  tempoDown: function tempoDown() {
-	    _MetronomeDispatcher2.default.dispatch({
+	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "tempoDown"
 	    });
 	  },
 	  setTradMode: function setTradMode(tradMode) {
-	    _MetronomeDispatcher2.default.dispatch({
+	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "setTradMode",
 	      tradMode: tradMode
 	    });
 	  },
 	  setBellCount: function setBellCount(count) {
-	    _MetronomeDispatcher2.default.dispatch({
+	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "setBellCount",
 	      count: count
 	    });
@@ -27816,11 +27830,13 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.dispatch = undefined;
 
 	var _flux = __webpack_require__(192);
 
 	var instance = new _flux.Dispatcher();
 	exports.default = instance;
+	var dispatch = exports.dispatch = instance.dispatch.bind(instance);
 
 /***/ },
 /* 192 */
@@ -28345,6 +28361,9 @@
 	  DEFAULT_MARKING_INDEX: 16,
 	  TEMPO_MIN: 1,
 	  TEMPO_MAX: 300,
+	  SCHEDULE_AHEAD_TIME: 0.1, // (sec)
+	  NOTE_LENGTH: 0.5, // (sec)
+	  TICK_INTERVAL: 100, // (msec)
 	  Messages: {
 	    TEMPO_VALUE_ERROR: "Invalid value of tempo!"
 	  }
@@ -28385,48 +28404,51 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var rafID;
+
 	var BellIcons = function (_Component) {
 	  _inherits(BellIcons, _Component);
 
 	  function BellIcons(props) {
 	    _classCallCheck(this, BellIcons);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BellIcons).call(this, props));
-
-	    _this.state = { active: false };
-	    return _this;
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(BellIcons).call(this, props));
 	  }
 
 	  _createClass(BellIcons, [{
 	    key: "componentWillReceiveProps",
 	    value: function componentWillReceiveProps(nextProps) {
-	      var _this2 = this;
-
-	      if (!nextProps.appState.playing) {
+	      var state = this.props.appState;
+	      var nextState = nextProps.appState;
+	      if (nextState.playing === false) {
 	        this.setState({ active: false });
-	        return;
-	      }
-	      if (this.props.appState.time !== nextProps.appState.time) {
+	        window.cancelAnimationFrame(rafID);
+	      } else if (state.nextNoteTime !== nextState.nextNoteTime) {
 	        this.setState({ active: true });
-	        setTimeout(function () {
-	          _this2.setState({ active: false });
-	        }, 100);
+	        rafID = window.requestAnimationFrame(this.draw.bind(this));
+	      }
+	    }
+	  }, {
+	    key: "draw",
+	    value: function draw() {
+	      //console.log('draw!');
+	      if (this.props.appState.playing === true) {
+	        rafID = window.requestAnimationFrame(this.draw.bind(this));
 	      }
 	    }
 	  }, {
 	    key: "render",
 	    value: function render() {
-	      var _this3 = this;
-
-	      var count = this.props.appState.bellCount;
-	      var beat = this.props.appState.beat;
+	      var state = this.props.appState;
+	      var count = state.bellCount;
+	      var beat = state.beat;
 	      var cName = (0, _classnames2.default)("bell-icon", {
-	        "bell-icon-active": this.state.active
+	        "bell-icon-active": state.playing
 	      });
 	      var icons = count <= 1 ? _react2.default.createElement("span", { className: cName }) : _lodash2.default.map(_lodash2.default.range(count), function (i) {
 	        var cName = (0, _classnames2.default)("bell-icon", {
 	          "bell-icon-top": i === 0,
-	          "bell-icon-active": i + 1 === beat && _this3.state.active
+	          "bell-icon-active": i + 1 === beat && state.playing
 	        });
 	        return _react2.default.createElement("span", { className: cName, key: "bell-icon" + i });
 	      });
@@ -44949,69 +44971,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var SE = function (_Component) {
-	  _inherits(SE, _Component);
-
-	  function SE(props) {
-	    _classCallCheck(this, SE);
-
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(SE).call(this, props));
-	  }
-
-	  _createClass(SE, [{
-	    key: "componentWillReceiveProps",
-	    value: function componentWillReceiveProps(nextProps) {
-	      if (nextProps.appState.playing) {
-	        var snare = this.refs.snare;
-	        var base = this.refs.base;
-	        var sound = nextProps.appState.beat === 1 && nextProps.appState.bellCount > 1 ? snare : base;
-	        sound.currentTime = 0;
-	        sound.play();
-	      }
-	    }
-	  }, {
-	    key: "render",
-	    value: function render() {
-	      return _react2.default.createElement(
-	        "div",
-	        { className: "se" },
-	        _react2.default.createElement("audio", { src: "./sound/snare.mp3", type: "audio/mpeg", controls: false, ref: "snare" }),
-	        _react2.default.createElement("audio", { src: "./sound/base.mp3", type: "audio/mpeg", controls: false, ref: "base" })
-	      );
-	    }
-	  }]);
-
-	  return SE;
-	}(_react.Component);
-
-	;
-
-	exports.default = SE;
-
-/***/ },
-/* 203 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
 	/**
 	 * - data validation
 	 * - error handling
@@ -45035,13 +44994,17 @@
 
 	var _MetronomeDispatcher2 = _interopRequireDefault(_MetronomeDispatcher);
 
-	var _ErrorHandler = __webpack_require__(204);
+	var _errorHandler = __webpack_require__(203);
 
-	var _ErrorHandler2 = _interopRequireDefault(_ErrorHandler);
+	var _errorHandler2 = _interopRequireDefault(_errorHandler);
 
 	var _Constants = __webpack_require__(197);
 
 	var _Constants2 = _interopRequireDefault(_Constants);
+
+	var _loadSound = __webpack_require__(204);
+
+	var _loadSound2 = _interopRequireDefault(_loadSound);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -45050,6 +45013,8 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var snareBuffer, baseBuffer;
 
 	var MetronomeStore = function (_MapStore) {
 	  _inherits(MetronomeStore, _MapStore);
@@ -45070,8 +45035,10 @@
 	        tempoError: false,
 	        markingIndex: _Constants2.default.DEFAULT_MARKING_INDEX,
 	        beat: 1, // 1 <= beat <= bellCount
-	        time: Date.now(),
-	        interval: 0,
+
+	        nextNoteTime: 0, // sec:integer
+	        current16thNote: 0, // :integer
+	        notesInQueue: [],
 
 	        // settings
 	        bellCount: 4,
@@ -45082,8 +45049,19 @@
 	  }, {
 	    key: "reduce",
 	    value: function reduce(state, action) {
+
 	      var tempo = state.get("tempo");
+
 	      switch (action.type) {
+	        case "init":
+	          (0, _loadSound2.default)(action.audioContext, './sound/snare.mp3', function (buffer) {
+	            snareBuffer = buffer;
+	          });
+	          (0, _loadSound2.default)(action.audioContext, './sound/base.mp3', function (buffer) {
+	            baseBuffer = buffer;
+	          });
+	          return state;
+	          break;
 	        case "save":
 	          var index = getMarkingIndexFromTempo(action.settings.tempo);
 	          return state.merge({
@@ -45096,41 +45074,61 @@
 	          });
 	          break;
 	        case "start":
-	          var interval = 60 / tempo * 1000;
 	          return state.merge({
 	            playing: true,
-	            time: Date.now(),
-	            interval: interval
+	            current16thNote: 0
 	          });
 	          break;
 	        case "stop":
 	          return state.merge({
-	            playing: false,
-	            time: Date.now()
+	            playing: false
 	          });
 	          break;
 	        case "tick":
-	          // TODO
-	          // Correct tempo interval (may cause by system performance)
-	          // through Date.now()
+	          var ctx = action.audioContext;
+	          var queue = state.get("notesInQueue");
+	          var bellCount = state.get("bellCount");
+	          var nextNoteTime = state.get("nextNoteTime");
+	          var current16thNote = state.get("current16thNote");
+	          while (nextNoteTime < ctx.currentTime + _Constants2.default.SCHEDULE_AHEAD_TIME) {
+	            // Schedule note
+	            // Update queue
+	            queue.push({
+	              time: ctx.currentTime,
+	              note: current16thNote
+	            });
+	            // Play sound
+	            playSound(ctx, current16thNote, nextNoteTime, bellCount);
+
+	            // Update setting of next note
+	            var secondsPerBeat = 60.0 / tempo;
+	            var secondsFor16thNote = 1 / 4 * secondsPerBeat;
+	            nextNoteTime += secondsFor16thNote;
+	            current16thNote++;
+	            if (current16thNote === bellCount * 4) {
+	              current16thNote = 0;
+	            }
+	          }
+
 	          var beat = getBeat(state);
 	          return state.merge({
 	            beat: beat,
 	            clearTimer: false,
-	            time: Date.now()
+	            nextNoteTime: nextNoteTime,
+	            current16thNote: current16thNote,
+	            notesInQueue: queue
 	          });
 	          break;
+
 	        case "tempoUpdate":
 	          var result;
 	          var newTempo = +action.tempo;
 	          if (_Constants2.default.TEMPO_MIN <= newTempo && newTempo <= _Constants2.default.TEMPO_MAX) {
-	            var interval = 60 / newTempo * 1000;
 	            result = {
 	              tempo: newTempo,
 	              viewTempo: newTempo,
 	              tempoError: false,
-	              clearTimer: true,
-	              interval: interval
+	              clearTimer: true
 	            };
 	          } else {
 	            result = {
@@ -45138,21 +45136,20 @@
 	              viewTempo: action.tempo,
 	              playing: false
 	            };
-	            (0, _ErrorHandler2.default)(_Constants.Messages.TEMPO_VALUE_ERROR);
+	            (0, _errorHandler2.default)(_Constants.Messages.TEMPO_VALUE_ERROR);
 	          }
 	          return state.merge(result);
 	          break;
+
 	        case "tempoUp":
 	          var tradMode = state.get("tradMode");
 	          var index = updateMarkingIndex(state.get("markingIndex") + 1);
 	          var newTempo = tradMode ? _Constants2.default.MARKINGS[index] : tempo + 1;
-	          var interval = 60 / newTempo * 1000;
 	          var result = {
 	            tempo: newTempo,
 	            viewTempo: newTempo,
 	            tempoError: false,
 	            clearTimer: true,
-	            interval: interval,
 	            markingIndex: index
 	          };
 	          return state.merge(result);
@@ -45161,13 +45158,11 @@
 	          var tradMode = state.get("tradMode");
 	          var index = updateMarkingIndex(state.get("markingIndex") - 1);
 	          var newTempo = tradMode ? _Constants2.default.MARKINGS[index] : tempo - 1;
-	          var interval = 60 / newTempo * 1000;
 	          var result = {
 	            tempo: newTempo,
 	            viewTempo: newTempo,
 	            tempoError: false,
 	            clearTimer: true,
-	            interval: interval,
 	            markingIndex: index
 	          };
 	          return state.merge(result);
@@ -45218,12 +45213,21 @@
 	  }
 	  return beat;
 	}
+	function playSound(ctx, current16thNote, nextNoteTime) {
+	  // 4分音符の頭では snare
+	  var buffer = current16thNote % 4 === 1 ? snareBuffer : baseBuffer;
+	  var src = ctx.createBufferSource();
+	  src.buffer = buffer;
+	  src.connect(ctx.destination);
+	  src.start(nextNoteTime);
+	  src.stop(nextNoteTime + _Constants2.default.NOTE_LENGTH);
+	}
 
 	var instance = new MetronomeStore(_MetronomeDispatcher2.default);
 	exports.default = instance;
 
 /***/ },
-/* 204 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -45250,6 +45254,34 @@
 	;
 
 /***/ },
+/* 204 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	exports.default = function (ctx, url, onLoad, onError) {
+	  if (!ctx instanceof AudioContext || !url instanceof String || !onLoad instanceof Function) {
+	    console.error('Invalid arguments for loadSound() function');
+	    return;
+	  }
+	  onError = typeof onError === 'function' ? onError : function () {};
+
+	  var xhr = new XMLHttpRequest();
+	  xhr.open('GET', url, true);
+	  xhr.responseType = 'arraybuffer';
+	  xhr.onload = function () {
+	    ctx.decodeAudioData(xhr.response, onLoad, onError);
+	  };
+	  xhr.send();
+	};
+
+	;
+
+/***/ },
 /* 205 */
 /***/ function(module, exports) {
 
@@ -45260,7 +45292,7 @@
 	});
 	var blob = "";
 	blob += 'var timer;';
-	blob += '';
+
 	blob += 'self.addEventListener("message", (e) => {';
 	blob += '  switch(e.data.type) {';
 	blob += '    case "ready":';
@@ -45269,10 +45301,10 @@
 	blob += '    case "start":';
 	blob += '      timer = setInterval(() => {';
 	blob += '        self.postMessage({ type: "tick" });';
-	blob += '      }, e.data.interval || 1000);';
+	blob += '      }, e.data.interval || 100);';
 	blob += '      break;';
-	blob += '    case "end":';
-	blob += '      self.postMessage({ type: "end" });';
+	blob += '    case "stop":';
+	blob += '      self.postMessage({ type: "stop" });';
 	blob += '      clearInterval(timer);';
 	blob += '      break;';
 	blob += '    default:';

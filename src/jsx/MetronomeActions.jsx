@@ -2,6 +2,12 @@
 import { dispatch }  from "./MetronomeDispatcher.jsx";
 
 const MetronomeActions = {
+  init (audioContext) {
+    dispatch({
+      type: "init",
+      audioContext: audioContext
+    });
+  },
   save (settings) {
     // send all state
     dispatch({
@@ -19,16 +25,12 @@ const MetronomeActions = {
       type: "stop"
     });
   },
-  tick () {
+  tick (audioContext) {
     dispatch({
-      type: "tick"
+      type: "tick",
+      audioContext: audioContext
     });
   },
-  draw () {
-    dispatch({
-    });
-  },
-
   tempoUpdate (val) {
     dispatch({
       type: "tempoUpdate",
