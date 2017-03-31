@@ -89,7 +89,7 @@ button
 
 // bell setting
 .group-bell-setting
-  margin-bottom 20px
+  margin-bottom 12px
   border 1px solid $borderColor
   border-radius 3px
   background-color #fff
@@ -117,22 +117,26 @@ button
 
 // bell icons
 .group-bell-icons
-  margin-bottom 20px
+  margin-bottom 12px
   text-align center
   clearfix()
 
 .bell-icon
   display inline-block
-  width 16px
-  height 16px
-  margin 0 7px
+  width 6px
+  height 6px
+  margin 8px 4px
   border-radius 8px
-  background-color #979797
-  vertical-align top
+  background-color #aaa
+  vertical-align middle
+  &:nth-of-type(4n+1)
+    width 10px
+    height 10px
+    background-color #999
   &-top
-    background-color #454545
+    background-color #454545 !important
   &-active
-    background-color #D0021B
+    background-color #D0021B !important
 
 // start button
 .btn-toggle

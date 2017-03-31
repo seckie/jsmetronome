@@ -28415,8 +28415,8 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var rafID;
-	var currentQuaterNote;
 	var last16thNoteDrawn;
+	var next16thNote;
 
 	var BellIcons = function (_Component) {
 	  _inherits(BellIcons, _Component);
@@ -28445,9 +28445,8 @@
 	    value: function draw() {
 	      var state = this.props.appState;
 	      var notesInQueue = state.notesInQueue;
-
-	      var next16thNote = last16thNoteDrawn;
 	      var isQueueUpdated = false;
+	      next16thNote = last16thNoteDrawn;
 	      while (notesInQueue.length && notesInQueue[0].time < state.audioContext.currentTime) {
 	        next16thNote = notesInQueue[0].note;
 	        notesInQueue.splice(0, 1);
@@ -28457,7 +28456,6 @@
 	      // Check: is the note already drawn
 	      if (last16thNoteDrawn !== next16thNote) {
 	        // draw
-	        currentQuaterNote = Math.ceil(next16thNote / 4);
 	        this.forceUpdate();
 	        last16thNoteDrawn = next16thNote;
 	      }
@@ -28475,14 +28473,12 @@
 	    key: "render",
 	    value: function render() {
 	      var state = this.props.appState;
-	      var count = state.bellCount;
-	      var cName = (0, _classnames2.default)("bell-icon", {
-	        "bell-icon-active": state.playing
-	      });
-	      var icons = count <= 1 ? _react2.default.createElement("span", { className: cName }) : _lodash2.default.map(_lodash2.default.range(count), function (i) {
+	      var count = state.bellCount * 4;
+
+	      var icons = _lodash2.default.map(_lodash2.default.range(count), function (i) {
 	        var cName = (0, _classnames2.default)("bell-icon", {
 	          "bell-icon-top": i === 0,
-	          "bell-icon-active": i + 1 === currentQuaterNote && state.playing
+	          "bell-icon-active": i + 1 === next16thNote && state.playing
 	        });
 	        return _react2.default.createElement("span", { className: cName, key: "bell-icon" + i });
 	      });

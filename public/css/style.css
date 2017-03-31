@@ -227,7 +227,7 @@ button.error {
   background-size: 32px 32px;
 }
 .group-bell-setting {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   border: 1px solid #979797;
   -webkit-border-radius: 3px;
   border-radius: 3px;
@@ -270,7 +270,7 @@ button.error {
   box-shadow: inset 1px 1px 2px 0 #979797;
 }
 .group-bell-icons {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   text-align: center;
   zoom: 1;
 }
@@ -284,19 +284,24 @@ button.error {
 }
 .bell-icon {
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin: 0 7px;
+  width: 6px;
+  height: 6px;
+  margin: 8px 4px;
   -webkit-border-radius: 8px;
   border-radius: 8px;
-  background-color: #979797;
-  vertical-align: top;
+  background-color: #aaa;
+  vertical-align: middle;
+}
+.bell-icon:nth-of-type(4n+1) {
+  width: 10px;
+  height: 10px;
+  background-color: #999;
 }
 .bell-icon-top {
-  background-color: #454545;
+  background-color: #454545 !important;
 }
 .bell-icon-active {
-  background-color: #d0021b;
+  background-color: #d0021b !important;
 }
 .btn-toggle {
   display: block;
