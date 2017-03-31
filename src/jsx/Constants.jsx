@@ -9,7 +9,7 @@ const Constants = {
   SCHEDULE_AHEAD_TIME: 0.1, // (sec)
   NOTE_LENGTH: 0.5, // (sec)
   TICK_INTERVAL: 100, // (msec)
-  DEFAULT_TEMPO: 200,
+  DEFAULT_TEMPO: 100,
   Messages: {
     TEMPO_VALUE_ERROR: "Invalid value of tempo!"
   }

@@ -18,6 +18,7 @@ var snareBuffer, baseBuffer;
 var current16thNote = 1; // (1 <= n <= 16)
 var nextNoteTime = 0; // (sec)
 var audioContext;
+var markingIndex = Constants.DEFAULT_MARKING_INDEX;
 
 class MetronomeStore extends MapStore {
   getInitialState (): State {
@@ -26,7 +27,6 @@ class MetronomeStore extends MapStore {
       playing: false,
       viewTempo: Constants.DEFAULT_TEMPO,
       tempoError: false,
-      markingIndex: Constants.DEFAULT_MARKING_INDEX,
       beat: 1, // 1 <= beat <= bellCount
 
       audioContext: null,
@@ -57,14 +57,12 @@ class MetronomeStore extends MapStore {
         return state.merge({ audioContext: action.audioContext });
         break;
       case "save":
-        var index = getMarkingIndexFromTempo(action.settings.tempo);
+        markingIndex = getMarkingIndexFromTempo(action.settings.tempo);
         return state.merge({
           bellCount: action.settings.bellCount,
           tempo: action.settings.tempo,
           tradMode: action.settings.tradMode,
-
           viewTempo: action.settings.tempo,
-          markingIndex: index
         });
         break;
       case "start":
@@ -134,36 +132,35 @@ class MetronomeStore extends MapStore {
 
       case "tempoUp":
         var tradMode = state.get("tradMode");
-        var index = updateMarkingIndex(state.get("markingIndex") + 1);
+        var index = updateMarkingIndex(markingIndex + 1);
         var newTempo = tradMode ? Constants.MARKINGS[index] : tempo + 1;
+        markingIndex = index;
         var result = {
           tempo: newTempo,
           viewTempo:  newTempo,
           tempoError: false,
           clearTimer: true,
-          markingIndex: index
         };
         return state.merge(result);
         break;
       case "tempoDown":
         var tradMode = state.get("tradMode");
-        var index = updateMarkingIndex(state.get("markingIndex") - 1);
+        var index = updateMarkingIndex(markingIndex - 1);
         var newTempo = tradMode ? Constants.MARKINGS[index] : tempo - 1;
+        markingIndex = index;
         var result = {
           tempo: newTempo,
           viewTempo:  newTempo,
           tempoError: false,
           clearTimer: true,
-          markingIndex: index
         };
         return state.merge(result);
         break;
       case "setTradMode":
         var tradMode = action.tradMode;
-        var index = getMarkingIndexFromTempo(tempo);
+        markingIndex = getMarkingIndexFromTempo(tempo);
         return state.merge({
           tradMode: action.tradMode,
-          markingIndex: index
         });
         break;
       case "setBellCount":
