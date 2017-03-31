@@ -30,7 +30,7 @@ worker.addEventListener("message", (e) => {
     case "ready":
       break;
     case "tick":
-      MetronomeActions.tick(audioContext);
+      MetronomeActions.tick();
       break;
     case "stop":
       break;

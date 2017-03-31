@@ -25,10 +25,9 @@ const MetronomeActions = {
       type: "stop"
     });
   },
-  tick (audioContext) {
+  tick () {
     dispatch({
-      type: "tick",
-      audioContext: audioContext
+      type: "tick"
     });
   },
   tempoUpdate (val) {
@@ -57,6 +56,12 @@ const MetronomeActions = {
     dispatch({
       type: "setBellCount",
       count: count
+    });
+  },
+  updateQueue (queue) {
+    dispatch({
+      type: "updateQueue",
+      queue: queue
     });
   }
 };

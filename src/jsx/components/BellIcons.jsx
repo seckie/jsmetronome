@@ -3,7 +3,11 @@ import React, { Component } from "react";
 import _ from "lodash";
 import classnames from "classnames";
 
+import MetronomeActions from "../MetronomeActions.jsx";
+
 var rafID;
+var currentQuaterNote;
+var last16thNoteDrawn;
 
 class BellIcons extends Component {
   constructor(props) {
@@ -15,15 +19,39 @@ class BellIcons extends Component {
     if (nextState.playing === false) {
       this.setState({ active: false });
       window.cancelAnimationFrame(rafID);
-    } else if (state.nextNoteTime !== nextState.nextNoteTime) {
+    } else if (state.playing === false && nextState.playing === true) {
       this.setState({ active: true });
       rafID = window.requestAnimationFrame(this.draw.bind(this));
     }
   }
 
   draw () {
-    //console.log('draw!');
-    if (this.props.appState.playing === true) {
+    var state = this.props.appState;
+    var notesInQueue = state.notesInQueue;
+
+    var next16thNote = last16thNoteDrawn;
+    var isQueueUpdated = false;
+    while (notesInQueue.length &&
+      notesInQueue[0].time < state.audioContext.currentTime) {
+      next16thNote = notesInQueue[0].note;
+      notesInQueue.splice(0, 1);
+      isQueueUpdated = true;
+    }
+
+    // Check: is the note already drawn
+    if (last16thNoteDrawn !== next16thNote) {
+      // draw
+      currentQuaterNote = Math.ceil(next16thNote / 4);
+      this.forceUpdate();
+      last16thNoteDrawn = next16thNote;
+    }
+
+    // update queue
+    if (isQueueUpdated === true) {
+      MetronomeActions.updateQueue(notesInQueue);
+    }
+    // loop
+    if (state.playing === true) {
       rafID = window.requestAnimationFrame(this.draw.bind(this));
     }
   }
@@ -31,7 +59,6 @@ class BellIcons extends Component {
   render () {
     var state = this.props.appState;
     var count = state.bellCount;
-    var beat = state.beat;
     var cName = classnames("bell-icon", {
       "bell-icon-active": state.playing
     });
@@ -40,7 +67,7 @@ class BellIcons extends Component {
     ): _.map(_.range(count), (i) => {
       var cName = classnames("bell-icon", {
         "bell-icon-top": i === 0,
-        "bell-icon-active": i + 1 === beat && state.playing
+        "bell-icon-active": i + 1 === currentQuaterNote && state.playing
       });
       return <span className={cName} key={"bell-icon" + i} />;
     });

@@ -15,25 +15,28 @@ import Constants, { Messages } from "./Constants.jsx";
 import loadSound from "./utils/loadSound.jsx";
 
 var snareBuffer, baseBuffer;
+var current16thNote = 1; // (1 <= n <= 16)
+var nextNoteTime = 0; // (sec)
+var audioContext;
 
 class MetronomeStore extends MapStore {
   getInitialState (): State {
     return Immutable.Map({
       clearTimer: true,
       playing: false,
-      viewTempo: 100,
+      viewTempo: Constants.DEFAULT_TEMPO,
       tempoError: false,
       markingIndex: Constants.DEFAULT_MARKING_INDEX,
       beat: 1, // 1 <= beat <= bellCount
 
-      nextNoteTime: 0, // sec:integer
-      current16thNote: 0, // :integer
-      notesInQueue: [],
+      audioContext: null,
+      notesInQueue: Immutable.List(),
 
       // settings
       bellCount: 4,
-      tempo: 100,
-      tradMode: false
+      tempo: Constants.DEFAULT_TEMPO,
+      tradMode: false,
+      noteResolution: 1 // 1 == quater, 2 == 8th, 3 == 16th
     });
   }
 
@@ -49,7 +52,9 @@ class MetronomeStore extends MapStore {
         loadSound(action.audioContext, './sound/base.mp3', function (buffer) {
           baseBuffer = buffer;
         });
-        return state;
+
+        audioContext = action.audioContext
+        return state.merge({ audioContext: action.audioContext });
         break;
       case "save":
         var index = getMarkingIndexFromTempo(action.settings.tempo);
@@ -63,9 +68,9 @@ class MetronomeStore extends MapStore {
         });
         break;
       case "start":
+        current16thNote = 1;
         return state.merge({
           playing: true,
-          current16thNote: 0,
         });
         break;
       case "stop":
@@ -74,28 +79,26 @@ class MetronomeStore extends MapStore {
         });
         break;
       case "tick":
-        const ctx = action.audioContext;
-        const queue = state.get("notesInQueue");
         const bellCount = state.get("bellCount");
-        var nextNoteTime = state.get("nextNoteTime");
-        var current16thNote = state.get("current16thNote");
-        while (nextNoteTime < ctx.currentTime + Constants.SCHEDULE_AHEAD_TIME) {
+        const noteResolution = state.get("noteResolution");
+        var queue = state.get("notesInQueue");
+        while (nextNoteTime < audioContext.currentTime + Constants.SCHEDULE_AHEAD_TIME) {
           // Schedule note
             // Update queue
-          queue.push({
-            time: ctx.currentTime,
+          queue = queue.push({
+            time: audioContext.currentTime,
             note: current16thNote
           });
             // Play sound
-          playSound(ctx, current16thNote, nextNoteTime, bellCount);
+          playSound(state);
 
           // Update setting of next note
           const secondsPerBeat = 60.0 / tempo;
           const secondsFor16thNote = 1 / 4 * secondsPerBeat;
           nextNoteTime += secondsFor16thNote;
           current16thNote++;
-          if (current16thNote === bellCount * 4) {
-            current16thNote = 0;
+          if (current16thNote > bellCount * 4) {
+            current16thNote = 1;
           }
         }
 
@@ -103,8 +106,6 @@ class MetronomeStore extends MapStore {
         return state.merge({
           beat: beat,
           clearTimer: false,
-          nextNoteTime: nextNoteTime,
-          current16thNote: current16thNote,
           notesInQueue: queue
         });
         break;
@@ -171,6 +172,13 @@ class MetronomeStore extends MapStore {
           clearTimer: true
         });
         break;
+
+      case "updateQueue":
+        return state.merge({
+          notesInQueue: action.queue
+        });
+        break;
+
       default:
         return state;
     }
@@ -198,12 +206,21 @@ function getBeat(state) {
   }
   return beat;
 }
-function playSound (ctx, current16thNote, nextNoteTime) {
+function playSound (state) {
+  const noteResolution = state.get("noteResolution");
+  if (noteResolution === 1 &&
+      current16thNote % 4 !== 1) {
+      return;
+  }
+  if (noteResolution === 2 &&
+      current16thNote % 2 !== 1) {
+      return;
+  }
   // 4分音符の頭では snare
   const buffer = (current16thNote % 4 === 1)  ? snareBuffer : baseBuffer;
-  const src = ctx.createBufferSource();
+  const src = audioContext.createBufferSource();
   src.buffer = buffer;
-  src.connect(ctx.destination);
+  src.connect(audioContext.destination);
   src.start(nextNoteTime);
   src.stop(nextNoteTime + Constants.NOTE_LENGTH);
 }

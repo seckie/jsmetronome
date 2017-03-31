@@ -21055,7 +21055,7 @@
 	    case "ready":
 	      break;
 	    case "tick":
-	      _MetronomeActions2.default.tick(audioContext);
+	      _MetronomeActions2.default.tick();
 	      break;
 	    case "stop":
 	      break;
@@ -27783,10 +27783,9 @@
 	      type: "stop"
 	    });
 	  },
-	  tick: function tick(audioContext) {
+	  tick: function tick() {
 	    (0, _MetronomeDispatcher.dispatch)({
-	      type: "tick",
-	      audioContext: audioContext
+	      type: "tick"
 	    });
 	  },
 	  tempoUpdate: function tempoUpdate(val) {
@@ -27815,6 +27814,12 @@
 	    (0, _MetronomeDispatcher.dispatch)({
 	      type: "setBellCount",
 	      count: count
+	    });
+	  },
+	  updateQueue: function updateQueue(queue) {
+	    (0, _MetronomeDispatcher.dispatch)({
+	      type: "updateQueue",
+	      queue: queue
 	    });
 	  }
 	};
@@ -28364,6 +28369,7 @@
 	  SCHEDULE_AHEAD_TIME: 0.1, // (sec)
 	  NOTE_LENGTH: 0.5, // (sec)
 	  TICK_INTERVAL: 100, // (msec)
+	  DEFAULT_TEMPO: 200,
 	  Messages: {
 	    TEMPO_VALUE_ERROR: "Invalid value of tempo!"
 	  }
@@ -28396,6 +28402,10 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
+	var _MetronomeActions = __webpack_require__(190);
+
+	var _MetronomeActions2 = _interopRequireDefault(_MetronomeActions);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28405,6 +28415,8 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var rafID;
+	var currentQuaterNote;
+	var last16thNoteDrawn;
 
 	var BellIcons = function (_Component) {
 	  _inherits(BellIcons, _Component);
@@ -28423,7 +28435,7 @@
 	      if (nextState.playing === false) {
 	        this.setState({ active: false });
 	        window.cancelAnimationFrame(rafID);
-	      } else if (state.nextNoteTime !== nextState.nextNoteTime) {
+	      } else if (state.playing === false && nextState.playing === true) {
 	        this.setState({ active: true });
 	        rafID = window.requestAnimationFrame(this.draw.bind(this));
 	      }
@@ -28431,8 +28443,31 @@
 	  }, {
 	    key: "draw",
 	    value: function draw() {
-	      //console.log('draw!');
-	      if (this.props.appState.playing === true) {
+	      var state = this.props.appState;
+	      var notesInQueue = state.notesInQueue;
+
+	      var next16thNote = last16thNoteDrawn;
+	      var isQueueUpdated = false;
+	      while (notesInQueue.length && notesInQueue[0].time < state.audioContext.currentTime) {
+	        next16thNote = notesInQueue[0].note;
+	        notesInQueue.splice(0, 1);
+	        isQueueUpdated = true;
+	      }
+
+	      // Check: is the note already drawn
+	      if (last16thNoteDrawn !== next16thNote) {
+	        // draw
+	        currentQuaterNote = Math.ceil(next16thNote / 4);
+	        this.forceUpdate();
+	        last16thNoteDrawn = next16thNote;
+	      }
+
+	      // update queue
+	      if (isQueueUpdated === true) {
+	        _MetronomeActions2.default.updateQueue(notesInQueue);
+	      }
+	      // loop
+	      if (state.playing === true) {
 	        rafID = window.requestAnimationFrame(this.draw.bind(this));
 	      }
 	    }
@@ -28441,14 +28476,13 @@
 	    value: function render() {
 	      var state = this.props.appState;
 	      var count = state.bellCount;
-	      var beat = state.beat;
 	      var cName = (0, _classnames2.default)("bell-icon", {
 	        "bell-icon-active": state.playing
 	      });
 	      var icons = count <= 1 ? _react2.default.createElement("span", { className: cName }) : _lodash2.default.map(_lodash2.default.range(count), function (i) {
 	        var cName = (0, _classnames2.default)("bell-icon", {
 	          "bell-icon-top": i === 0,
-	          "bell-icon-active": i + 1 === beat && state.playing
+	          "bell-icon-active": i + 1 === currentQuaterNote && state.playing
 	        });
 	        return _react2.default.createElement("span", { className: cName, key: "bell-icon" + i });
 	      });
@@ -45015,6 +45049,9 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var snareBuffer, baseBuffer;
+	var current16thNote = 1; // (1 <= n <= 16)
+	var nextNoteTime = 0; // (sec)
+	var audioContext;
 
 	var MetronomeStore = function (_MapStore) {
 	  _inherits(MetronomeStore, _MapStore);
@@ -45031,19 +45068,19 @@
 	      return _immutable2.default.Map({
 	        clearTimer: true,
 	        playing: false,
-	        viewTempo: 100,
+	        viewTempo: _Constants2.default.DEFAULT_TEMPO,
 	        tempoError: false,
 	        markingIndex: _Constants2.default.DEFAULT_MARKING_INDEX,
 	        beat: 1, // 1 <= beat <= bellCount
 
-	        nextNoteTime: 0, // sec:integer
-	        current16thNote: 0, // :integer
-	        notesInQueue: [],
+	        audioContext: null,
+	        notesInQueue: _immutable2.default.List(),
 
 	        // settings
 	        bellCount: 4,
-	        tempo: 100,
-	        tradMode: false
+	        tempo: _Constants2.default.DEFAULT_TEMPO,
+	        tradMode: false,
+	        noteResolution: 1 // 1 == quater, 2 == 8th, 3 == 16th
 	      });
 	    }
 	  }, {
@@ -45060,7 +45097,9 @@
 	          (0, _loadSound2.default)(action.audioContext, './sound/base.mp3', function (buffer) {
 	            baseBuffer = buffer;
 	          });
-	          return state;
+
+	          audioContext = action.audioContext;
+	          return state.merge({ audioContext: action.audioContext });
 	          break;
 	        case "save":
 	          var index = getMarkingIndexFromTempo(action.settings.tempo);
@@ -45074,9 +45113,9 @@
 	          });
 	          break;
 	        case "start":
+	          current16thNote = 1;
 	          return state.merge({
-	            playing: true,
-	            current16thNote: 0
+	            playing: true
 	          });
 	          break;
 	        case "stop":
@@ -45085,28 +45124,26 @@
 	          });
 	          break;
 	        case "tick":
-	          var ctx = action.audioContext;
-	          var queue = state.get("notesInQueue");
 	          var bellCount = state.get("bellCount");
-	          var nextNoteTime = state.get("nextNoteTime");
-	          var current16thNote = state.get("current16thNote");
-	          while (nextNoteTime < ctx.currentTime + _Constants2.default.SCHEDULE_AHEAD_TIME) {
+	          var noteResolution = state.get("noteResolution");
+	          var queue = state.get("notesInQueue");
+	          while (nextNoteTime < audioContext.currentTime + _Constants2.default.SCHEDULE_AHEAD_TIME) {
 	            // Schedule note
 	            // Update queue
-	            queue.push({
-	              time: ctx.currentTime,
+	            queue = queue.push({
+	              time: audioContext.currentTime,
 	              note: current16thNote
 	            });
 	            // Play sound
-	            playSound(ctx, current16thNote, nextNoteTime, bellCount);
+	            playSound(state);
 
 	            // Update setting of next note
 	            var secondsPerBeat = 60.0 / tempo;
 	            var secondsFor16thNote = 1 / 4 * secondsPerBeat;
 	            nextNoteTime += secondsFor16thNote;
 	            current16thNote++;
-	            if (current16thNote === bellCount * 4) {
-	              current16thNote = 0;
+	            if (current16thNote > bellCount * 4) {
+	              current16thNote = 1;
 	            }
 	          }
 
@@ -45114,8 +45151,6 @@
 	          return state.merge({
 	            beat: beat,
 	            clearTimer: false,
-	            nextNoteTime: nextNoteTime,
-	            current16thNote: current16thNote,
 	            notesInQueue: queue
 	          });
 	          break;
@@ -45181,6 +45216,13 @@
 	            clearTimer: true
 	          });
 	          break;
+
+	        case "updateQueue":
+	          return state.merge({
+	            notesInQueue: action.queue
+	          });
+	          break;
+
 	        default:
 	          return state;
 	      }
@@ -45213,12 +45255,19 @@
 	  }
 	  return beat;
 	}
-	function playSound(ctx, current16thNote, nextNoteTime) {
+	function playSound(state) {
+	  var noteResolution = state.get("noteResolution");
+	  if (noteResolution === 1 && current16thNote % 4 !== 1) {
+	    return;
+	  }
+	  if (noteResolution === 2 && current16thNote % 2 !== 1) {
+	    return;
+	  }
 	  // 4分音符の頭では snare
 	  var buffer = current16thNote % 4 === 1 ? snareBuffer : baseBuffer;
-	  var src = ctx.createBufferSource();
+	  var src = audioContext.createBufferSource();
 	  src.buffer = buffer;
-	  src.connect(ctx.destination);
+	  src.connect(audioContext.destination);
 	  src.start(nextNoteTime);
 	  src.stop(nextNoteTime + _Constants2.default.NOTE_LENGTH);
 	}
