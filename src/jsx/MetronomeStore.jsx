@@ -66,6 +66,7 @@ class MetronomeStore extends MapStore {
         break;
       case "start":
         current16thNote = 1;
+        nextNoteTime = getNextNoteTime(audioContext.currentTime, tempo);
         return state.merge({
           playing: true
         });
@@ -90,9 +91,8 @@ class MetronomeStore extends MapStore {
           playSound(state);
 
           // Update setting of next note
-          const secondsPerBeat = 60.0 / tempo;
-          const secondsFor16thNote = 1 / 4 * secondsPerBeat;
-          nextNoteTime += secondsFor16thNote;
+          nextNoteTime = getNextNoteTime(nextNoteTime, tempo);
+
           current16thNote++;
           if (current16thNote > bellCount * 4) {
             current16thNote = 1;
@@ -216,6 +216,11 @@ function playSound (state) {
   src.connect(audioContext.destination);
   src.start(nextNoteTime);
   src.stop(nextNoteTime + Constants.NOTE_LENGTH);
+}
+function getNextNoteTime (currentTime, tempo) {
+  const secondsPerBeat = 60.0 / tempo;
+  const secondsFor16thNote = 1 / 4 * secondsPerBeat;
+  return currentTime + secondsFor16thNote;
 }
 
 const instance = new MetronomeStore(MetronomeDispatcher);

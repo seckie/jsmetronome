@@ -45219,6 +45219,7 @@
 	          break;
 	        case "start":
 	          current16thNote = 1;
+	          nextNoteTime = getNextNoteTime(audioContext.currentTime, tempo);
 	          return state.merge({
 	            playing: true
 	          });
@@ -45243,9 +45244,8 @@
 	            playSound(state);
 
 	            // Update setting of next note
-	            var secondsPerBeat = 60.0 / tempo;
-	            var secondsFor16thNote = 1 / 4 * secondsPerBeat;
-	            nextNoteTime += secondsFor16thNote;
+	            nextNoteTime = getNextNoteTime(nextNoteTime, tempo);
+
 	            current16thNote++;
 	            if (current16thNote > bellCount * 4) {
 	              current16thNote = 1;
@@ -45371,6 +45371,11 @@
 	  src.connect(audioContext.destination);
 	  src.start(nextNoteTime);
 	  src.stop(nextNoteTime + _Constants2.default.NOTE_LENGTH);
+	}
+	function getNextNoteTime(currentTime, tempo) {
+	  var secondsPerBeat = 60.0 / tempo;
+	  var secondsFor16thNote = 1 / 4 * secondsPerBeat;
+	  return currentTime + secondsFor16thNote;
 	}
 
 	var instance = new MetronomeStore(_MetronomeDispatcher2.default);
