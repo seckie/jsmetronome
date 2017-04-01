@@ -27,7 +27,6 @@ class MetronomeStore extends MapStore {
       playing: false,
       viewTempo: Constants.DEFAULT_TEMPO,
       tempoError: false,
-      beat: 1, // 1 <= beat <= bellCount
 
       audioContext: null,
       notesInQueue: Immutable.List(),
@@ -100,9 +99,7 @@ class MetronomeStore extends MapStore {
           }
         }
 
-        const beat = getBeat(state);
         return state.merge({
-          beat: beat,
           clearTimer: false,
           notesInQueue: queue
         });
@@ -201,13 +198,6 @@ function getMarkingIndexFromTempo(tempo) {
   return _.findIndex(Constants.MARKINGS, (marking) => {
     return tempo <= marking;
   });
-}
-function getBeat(state) {
-  var beat = state.get("beat") + 1;
-  if (beat > state.get("bellCount")) {
-    beat = 1;
-  }
-  return beat;
 }
 function playSound (state) {
   const noteResolution = state.get("noteResolution");

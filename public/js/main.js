@@ -45179,7 +45179,6 @@
 	        playing: false,
 	        viewTempo: _Constants2.default.DEFAULT_TEMPO,
 	        tempoError: false,
-	        beat: 1, // 1 <= beat <= bellCount
 
 	        audioContext: null,
 	        notesInQueue: _immutable2.default.List(),
@@ -45253,9 +45252,7 @@
 	            }
 	          }
 
-	          var beat = getBeat(state);
 	          return state.merge({
-	            beat: beat,
 	            clearTimer: false,
 	            notesInQueue: queue
 	          });
@@ -45358,13 +45355,6 @@
 	  return _.findIndex(_Constants2.default.MARKINGS, function (marking) {
 	    return tempo <= marking;
 	  });
-	}
-	function getBeat(state) {
-	  var beat = state.get("beat") + 1;
-	  if (beat > state.get("bellCount")) {
-	    beat = 1;
-	  }
-	  return beat;
 	}
 	function playSound(state) {
 	  var noteResolution = state.get("noteResolution");
