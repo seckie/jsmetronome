@@ -169,6 +169,12 @@ class MetronomeStore extends MapStore {
           clearTimer: true
         });
         break;
+      case "setNoteResolution":
+        return state.merge({
+          noteResolution: action.resolution,
+          clearTimer: true
+        });
+        break;
 
       case "updateQueue":
         return state.merge({

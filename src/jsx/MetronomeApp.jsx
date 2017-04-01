@@ -9,6 +9,7 @@ import TempoValue from "./components/TempoValue.jsx";
 import TempoSetting from "./components/TempoSetting.jsx";
 import BellSetting from "./components/BellSetting.jsx";
 import BellIcons from "./components/BellIcons.jsx";
+import NoteResolutionSetting from "./components/NoteResolutionSetting.jsx";
 import StartButton from "./components/StartButton.jsx";
 
 import MetronomeStore from "./MetronomeStore.jsx";
@@ -103,6 +104,7 @@ class MetronomeApp extends Component {
         <TempoValue appState={this.state} />
         <TempoSetting appState={this.state} />
         <BellSetting appState={this.state} />
+        <NoteResolutionSetting appState={this.state} />
         <BellIcons appState={this.state} />
         <StartButton appState={this.state} />
       </div>

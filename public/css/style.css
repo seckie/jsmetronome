@@ -229,8 +229,8 @@ button.error {
 .group-bell-setting {
   margin-bottom: 12px;
   border: 1px solid #979797;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
   background-color: #fff;
 }
 .group-bell-setting .row {
@@ -268,6 +268,47 @@ button.error {
   color: #f33;
   -webkit-box-shadow: inset 1px 1px 2px 0 #979797;
   box-shadow: inset 1px 1px 2px 0 #979797;
+}
+.resolution-setting {
+  margin-bottom: 12px;
+  border: 1px solid #979797;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  background-color: #fff;
+  zoom: 1;
+}
+.resolution-setting:before,
+.resolution-setting:after {
+  content: "";
+  display: table;
+}
+.resolution-setting:after {
+  clear: both;
+}
+.resolution-setting-button {
+  float: left;
+  width: 33.3%;
+  padding: 3px 0;
+  border: 0;
+  border-right: 1px solid #979797;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+.resolution-setting-button:last-child {
+  border-right: 0;
+}
+.resolution-setting-button-active {
+  color: #f33;
+  -webkit-box-shadow: inset 1px 1px 2px 0 #979797;
+  box-shadow: inset 1px 1px 2px 0 #979797;
+}
+.resolution-setting-button-active svg {
+  fill: #f00;
+}
+.resolution-setting-button svg {
+  height: 26px;
+  vertical-align: top;
 }
 .group-bell-icons {
   margin-bottom: 12px;

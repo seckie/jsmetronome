@@ -91,7 +91,7 @@ button
 .group-bell-setting
   margin-bottom 12px
   border 1px solid $borderColor
-  border-radius 3px
+  border-radius 5px
   background-color #fff
   .row
     display block
@@ -113,6 +113,32 @@ button
   &-active
     color #f33
     box-shadow inset 1px 1px 2px 0 $borderColor
+
+// resolution setting
+.resolution-setting
+  margin-bottom 12px
+  border 1px solid $borderColor
+  border-radius 5px
+  background-color #fff
+  clearfix()
+  &-button
+    float left
+    width 33.3%
+    padding 3px 0
+    border 0
+    border-right 1px solid $borderColor
+    border-radius 0
+    background-color transparent
+    &:last-child
+      border-right 0
+    &-active
+      color #f33
+      box-shadow inset 1px 1px 2px 0 $borderColor
+      svg
+        fill red
+    svg
+      height 26px
+      vertical-align top
 
 
 // bell icons

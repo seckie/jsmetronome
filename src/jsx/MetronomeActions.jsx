@@ -58,6 +58,12 @@ const MetronomeActions = {
       count: count
     });
   },
+  setNoteResolution (resolution) {
+    dispatch({
+      type: "setNoteResolution",
+      resolution: resolution
+    });
+  },
   updateQueue (queue) {
     dispatch({
       type: "updateQueue",
