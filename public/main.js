@@ -15,9 +15,7 @@ app.on("window-all-closed", () => {
 app.on("ready", () => {
   mainWindow = new BrowserWindow({
     width: 300,
-    height: 328,
-//    width: 1200,
-//    height: 728,
+    height: 400,
     resizable: false,
     title: "JSMetronome",
     frame: false,

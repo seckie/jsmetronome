@@ -91,7 +91,7 @@ button
 .group-bell-setting
   margin-bottom 20px
   border 1px solid $borderColor
-  border-radius 3px
+  border-radius 5px
   background-color #fff
   .row
     display block
@@ -114,25 +114,73 @@ button
     color #f33
     box-shadow inset 1px 1px 2px 0 $borderColor
 
+// resolution setting
+.resolution-setting
+  margin-bottom 20px
+  border 1px solid $borderColor
+  border-radius 5px
+  background-color #fff
+  clearfix()
+  &-button
+    float left
+    width 33.3%
+    padding 3px 0
+    border 0
+    border-right 1px solid $borderColor
+    border-radius 0
+    background-color transparent
+    &:last-child
+      border-right 0
+    &-active
+      color #f33
+      box-shadow inset 1px 1px 2px 0 $borderColor
+      svg
+        fill red
+    svg
+      height 26px
+      vertical-align top
+
 
 // bell icons
 .group-bell-icons
   margin-bottom 20px
-  text-align center
+  padding 0 0 0 4%
+  border-radius 5px
+  background-color black
+  overflow hidden
   clearfix()
 
 .bell-icon
-  display inline-block
-  width 16px
-  height 16px
-  margin 0 7px
-  border-radius 8px
-  background-color #979797
-  vertical-align top
+  display block
+  position relative
+  float left
+  width 6%
+  height 20px
+  background-color black
+  span
+    display block
+    position absolute
+    top 50%
+    left 50%
+    width 4px
+    height 4px
+    margin -2px 0 0 -2px
+    border-radius 2px
+    background-color #ccc
+
+  &:nth-of-type(4n+1)
+    span
+      background-color #999
+      width 8px
+      height 8px
+      margin -4px 0 0 -4px
+      border-radius 4px
   &-top
-    background-color #454545
+    span
+      background-color #fff !important
   &-active
-    background-color #D0021B
+    span
+      background-color #D0021B !important
 
 // start button
 .btn-toggle

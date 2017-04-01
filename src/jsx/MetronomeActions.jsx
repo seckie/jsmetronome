@@ -2,10 +2,9 @@
 import { dispatch }  from "./MetronomeDispatcher.jsx";
 
 const MetronomeActions = {
-  init (audioContext) {
+  init () {
     dispatch({
-      type: "init",
-      audioContext: audioContext
+      type: "init"
     });
   },
   save (settings) {
@@ -56,6 +55,12 @@ const MetronomeActions = {
     dispatch({
       type: "setBellCount",
       count: count
+    });
+  },
+  setNoteResolution (resolution) {
+    dispatch({
+      type: "setNoteResolution",
+      resolution: resolution
     });
   },
   updateQueue (queue) {

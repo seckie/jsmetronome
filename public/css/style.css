@@ -229,8 +229,8 @@ button.error {
 .group-bell-setting {
   margin-bottom: 20px;
   border: 1px solid #979797;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
   background-color: #fff;
 }
 .group-bell-setting .row {
@@ -269,9 +269,54 @@ button.error {
   -webkit-box-shadow: inset 1px 1px 2px 0 #979797;
   box-shadow: inset 1px 1px 2px 0 #979797;
 }
+.resolution-setting {
+  margin-bottom: 20px;
+  border: 1px solid #979797;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  background-color: #fff;
+  zoom: 1;
+}
+.resolution-setting:before,
+.resolution-setting:after {
+  content: "";
+  display: table;
+}
+.resolution-setting:after {
+  clear: both;
+}
+.resolution-setting-button {
+  float: left;
+  width: 33.3%;
+  padding: 3px 0;
+  border: 0;
+  border-right: 1px solid #979797;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+.resolution-setting-button:last-child {
+  border-right: 0;
+}
+.resolution-setting-button-active {
+  color: #f33;
+  -webkit-box-shadow: inset 1px 1px 2px 0 #979797;
+  box-shadow: inset 1px 1px 2px 0 #979797;
+}
+.resolution-setting-button-active svg {
+  fill: #f00;
+}
+.resolution-setting-button svg {
+  height: 26px;
+  vertical-align: top;
+}
 .group-bell-icons {
   margin-bottom: 20px;
-  text-align: center;
+  padding: 0 0 0 4%;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  background-color: #000;
+  overflow: hidden;
   zoom: 1;
 }
 .group-bell-icons:before,
@@ -283,20 +328,38 @@ button.error {
   clear: both;
 }
 .bell-icon {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin: 0 7px;
-  -webkit-border-radius: 8px;
-  border-radius: 8px;
-  background-color: #979797;
-  vertical-align: top;
+  display: block;
+  position: relative;
+  float: left;
+  width: 6%;
+  height: 20px;
+  background-color: #000;
 }
-.bell-icon-top {
-  background-color: #454545;
+.bell-icon span {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  background-color: #ccc;
 }
-.bell-icon-active {
-  background-color: #d0021b;
+.bell-icon:nth-of-type(4n+1) span {
+  background-color: #999;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+.bell-icon-top span {
+  background-color: #fff !important;
+}
+.bell-icon-active span {
+  background-color: #d0021b !important;
 }
 .btn-toggle {
   display: block;

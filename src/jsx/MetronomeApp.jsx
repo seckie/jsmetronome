@@ -9,6 +9,7 @@ import TempoValue from "./components/TempoValue.jsx";
 import TempoSetting from "./components/TempoSetting.jsx";
 import BellSetting from "./components/BellSetting.jsx";
 import BellIcons from "./components/BellIcons.jsx";
+import NoteResolutionSetting from "./components/NoteResolutionSetting.jsx";
 import StartButton from "./components/StartButton.jsx";
 
 import MetronomeStore from "./MetronomeStore.jsx";
@@ -22,8 +23,6 @@ var blob = new Blob(
 );
 var blobURL = window.URL.createObjectURL(blob);
 var worker = new Worker(blobURL);
-
-var audioContext = new AudioContext();
 
 worker.addEventListener("message", (e) => {
   switch(e.data.type) {
@@ -89,7 +88,7 @@ class MetronomeApp extends Component {
 
   componentWillMount () {
     ipcRenderer.send("initialized");
-    MetronomeActions.init(audioContext);
+    MetronomeActions.init();
     window.addEventListener("keyup", this.onKeyUp.bind(this), false);
   }
   componentWillUnmount () {
@@ -103,6 +102,7 @@ class MetronomeApp extends Component {
         <TempoValue appState={this.state} />
         <TempoSetting appState={this.state} />
         <BellSetting appState={this.state} />
+        <NoteResolutionSetting appState={this.state} />
         <BellIcons appState={this.state} />
         <StartButton appState={this.state} />
       </div>

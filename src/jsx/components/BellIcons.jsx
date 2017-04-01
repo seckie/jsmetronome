@@ -6,8 +6,8 @@ import classnames from "classnames";
 import MetronomeActions from "../MetronomeActions.jsx";
 
 var rafID;
-var currentQuaterNote;
 var last16thNoteDrawn;
+var next16thNote;
 
 class BellIcons extends Component {
   constructor(props) {
@@ -17,6 +17,8 @@ class BellIcons extends Component {
     var state = this.props.appState;
     var nextState = nextProps.appState;
     if (nextState.playing === false) {
+      last16thNoteDrawn = null;
+      next16thNote = null;
       this.setState({ active: false });
       window.cancelAnimationFrame(rafID);
     } else if (state.playing === false && nextState.playing === true) {
@@ -28,9 +30,8 @@ class BellIcons extends Component {
   draw () {
     var state = this.props.appState;
     var notesInQueue = state.notesInQueue;
-
-    var next16thNote = last16thNoteDrawn;
     var isQueueUpdated = false;
+    next16thNote = last16thNoteDrawn;
     while (notesInQueue.length &&
       notesInQueue[0].time < state.audioContext.currentTime) {
       next16thNote = notesInQueue[0].note;
@@ -41,7 +42,6 @@ class BellIcons extends Component {
     // Check: is the note already drawn
     if (last16thNoteDrawn !== next16thNote) {
       // draw
-      currentQuaterNote = Math.ceil(next16thNote / 4);
       this.forceUpdate();
       last16thNoteDrawn = next16thNote;
     }
@@ -58,18 +58,14 @@ class BellIcons extends Component {
 
   render () {
     var state = this.props.appState;
-    var count = state.bellCount;
-    var cName = classnames("bell-icon", {
-      "bell-icon-active": state.playing
-    });
-    var icons = count <= 1 ? (
-      <span className={cName} />
-    ): _.map(_.range(count), (i) => {
+    var count = state.bellCount * 4;
+
+    var icons = _.map(_.range(count), (i) => {
       var cName = classnames("bell-icon", {
         "bell-icon-top": i === 0,
-        "bell-icon-active": i + 1 === currentQuaterNote && state.playing
+        "bell-icon-active": i + 1 === next16thNote && state.playing
       });
-      return <span className={cName} key={"bell-icon" + i} />;
+      return <span className={cName} key={"bell-icon" + i}><span/></span>;
     });
     return (
       <p className={"group-bell-icons bell-icons" + count}>{icons}</p>

@@ -17,7 +17,7 @@ import loadSound from "./utils/loadSound.jsx";
 var snareBuffer, baseBuffer;
 var current16thNote = 1; // (1 <= n <= 16)
 var nextNoteTime = 0; // (sec)
-var audioContext;
+var audioContext = new AudioContext();
 var markingIndex = Constants.DEFAULT_MARKING_INDEX;
 
 class MetronomeStore extends MapStore {
@@ -27,7 +27,6 @@ class MetronomeStore extends MapStore {
       playing: false,
       viewTempo: Constants.DEFAULT_TEMPO,
       tempoError: false,
-      beat: 1, // 1 <= beat <= bellCount
 
       audioContext: null,
       notesInQueue: Immutable.List(),
@@ -46,15 +45,14 @@ class MetronomeStore extends MapStore {
 
     switch (action.type) {
       case "init":
-        loadSound(action.audioContext, './sound/snare.mp3', function (buffer) {
+        loadSound(audioContext, './sound/snare.mp3', function (buffer) {
           snareBuffer = buffer;
         });
-        loadSound(action.audioContext, './sound/base.mp3', function (buffer) {
+        loadSound(audioContext, './sound/base.mp3', function (buffer) {
           baseBuffer = buffer;
         });
 
-        audioContext = action.audioContext
-        return state.merge({ audioContext: action.audioContext });
+        return state.merge({ audioContext: audioContext });
         break;
       case "save":
         markingIndex = getMarkingIndexFromTempo(action.settings.tempo);
@@ -63,12 +61,14 @@ class MetronomeStore extends MapStore {
           tempo: action.settings.tempo,
           tradMode: action.settings.tradMode,
           viewTempo: action.settings.tempo,
+          noteResolution: action.settings.noteResolution
         });
         break;
       case "start":
         current16thNote = 1;
+        nextNoteTime = getNextNoteTime(audioContext.currentTime, tempo);
         return state.merge({
-          playing: true,
+          playing: true
         });
         break;
       case "stop":
@@ -91,18 +91,15 @@ class MetronomeStore extends MapStore {
           playSound(state);
 
           // Update setting of next note
-          const secondsPerBeat = 60.0 / tempo;
-          const secondsFor16thNote = 1 / 4 * secondsPerBeat;
-          nextNoteTime += secondsFor16thNote;
+          nextNoteTime = getNextNoteTime(nextNoteTime, tempo);
+
           current16thNote++;
           if (current16thNote > bellCount * 4) {
             current16thNote = 1;
           }
         }
 
-        const beat = getBeat(state);
         return state.merge({
-          beat: beat,
           clearTimer: false,
           notesInQueue: queue
         });
@@ -169,6 +166,12 @@ class MetronomeStore extends MapStore {
           clearTimer: true
         });
         break;
+      case "setNoteResolution":
+        return state.merge({
+          noteResolution: action.resolution,
+          clearTimer: true
+        });
+        break;
 
       case "updateQueue":
         return state.merge({
@@ -196,13 +199,6 @@ function getMarkingIndexFromTempo(tempo) {
     return tempo <= marking;
   });
 }
-function getBeat(state) {
-  var beat = state.get("beat") + 1;
-  if (beat > state.get("bellCount")) {
-    beat = 1;
-  }
-  return beat;
-}
 function playSound (state) {
   const noteResolution = state.get("noteResolution");
   if (noteResolution === 1 &&
@@ -220,6 +216,11 @@ function playSound (state) {
   src.connect(audioContext.destination);
   src.start(nextNoteTime);
   src.stop(nextNoteTime + Constants.NOTE_LENGTH);
+}
+function getNextNoteTime (currentTime, tempo) {
+  const secondsPerBeat = 60.0 / tempo;
+  const secondsFor16thNote = 1 / 4 * secondsPerBeat;
+  return currentTime + secondsFor16thNote;
 }
 
 const instance = new MetronomeStore(MetronomeDispatcher);
