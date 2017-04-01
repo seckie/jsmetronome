@@ -63,7 +63,7 @@ class BellIcons extends Component {
         "bell-icon-top": i === 0,
         "bell-icon-active": i + 1 === next16thNote && state.playing
       });
-      return <span className={cName} key={"bell-icon" + i} />;
+      return <span className={cName} key={"bell-icon" + i}><span/></span>;
     });
     return (
       <p className={"group-bell-icons bell-icons" + count}>{icons}</p>

@@ -28491,7 +28491,11 @@
 	          "bell-icon-top": i === 0,
 	          "bell-icon-active": i + 1 === next16thNote && state.playing
 	        });
-	        return _react2.default.createElement("span", { className: cName, key: "bell-icon" + i });
+	        return _react2.default.createElement(
+	          "span",
+	          { className: cName, key: "bell-icon" + i },
+	          _react2.default.createElement("span", null)
+	        );
 	      });
 	      return _react2.default.createElement(
 	        "p",
