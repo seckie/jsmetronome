@@ -63,6 +63,7 @@ class MetronomeStore extends MapStore {
           tempo: action.settings.tempo,
           tradMode: action.settings.tradMode,
           viewTempo: action.settings.tempo,
+          noteResolution: action.settings.noteResolution
         });
         break;
       case "start":

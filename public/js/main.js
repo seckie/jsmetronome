@@ -45216,7 +45216,8 @@
 	            bellCount: action.settings.bellCount,
 	            tempo: action.settings.tempo,
 	            tradMode: action.settings.tradMode,
-	            viewTempo: action.settings.tempo
+	            viewTempo: action.settings.tempo,
+	            noteResolution: action.settings.noteResolution
 	          });
 	          break;
 	        case "start":
