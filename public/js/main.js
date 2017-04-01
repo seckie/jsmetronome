@@ -21052,8 +21052,6 @@
 	var blobURL = window.URL.createObjectURL(blob);
 	var worker = new Worker(blobURL);
 
-	var audioContext = new AudioContext();
-
 	worker.addEventListener("message", function (e) {
 	  switch (e.data.type) {
 	    case "ready":
@@ -21090,7 +21088,7 @@
 	    key: "componentWillMount",
 	    value: function componentWillMount() {
 	      ipcRenderer.send("initialized");
-	      _MetronomeActions2.default.init(audioContext);
+	      _MetronomeActions2.default.init();
 	      window.addEventListener("keyup", this.onKeyUp.bind(this), false);
 	    }
 	  }, {
@@ -27765,10 +27763,9 @@
 	var _MetronomeDispatcher = __webpack_require__(191);
 
 	var MetronomeActions = {
-	  init: function init(audioContext) {
+	  init: function init() {
 	    (0, _MetronomeDispatcher.dispatch)({
-	      type: "init",
-	      audioContext: audioContext
+	      type: "init"
 	    });
 	  },
 	  save: function save(settings) {
@@ -28444,6 +28441,8 @@
 	      var state = this.props.appState;
 	      var nextState = nextProps.appState;
 	      if (nextState.playing === false) {
+	        last16thNoteDrawn = null;
+	        next16thNote = null;
 	        this.setState({ active: false });
 	        window.cancelAnimationFrame(rafID);
 	      } else if (state.playing === false && nextState.playing === true) {
@@ -45160,7 +45159,7 @@
 	var snareBuffer, baseBuffer;
 	var current16thNote = 1; // (1 <= n <= 16)
 	var nextNoteTime = 0; // (sec)
-	var audioContext;
+	var audioContext = new AudioContext();
 	var markingIndex = _Constants2.default.DEFAULT_MARKING_INDEX;
 
 	var MetronomeStore = function (_MapStore) {
@@ -45200,15 +45199,14 @@
 
 	      switch (action.type) {
 	        case "init":
-	          (0, _loadSound2.default)(action.audioContext, './sound/snare.mp3', function (buffer) {
+	          (0, _loadSound2.default)(audioContext, './sound/snare.mp3', function (buffer) {
 	            snareBuffer = buffer;
 	          });
-	          (0, _loadSound2.default)(action.audioContext, './sound/base.mp3', function (buffer) {
+	          (0, _loadSound2.default)(audioContext, './sound/base.mp3', function (buffer) {
 	            baseBuffer = buffer;
 	          });
 
-	          audioContext = action.audioContext;
-	          return state.merge({ audioContext: action.audioContext });
+	          return state.merge({ audioContext: audioContext });
 	          break;
 	        case "save":
 	          markingIndex = getMarkingIndexFromTempo(action.settings.tempo);
@@ -45425,8 +45423,8 @@
 	  value: true
 	});
 
-	exports.default = function (ctx, url, onLoad, onError) {
-	  if (!ctx instanceof AudioContext || !url instanceof String || !onLoad instanceof Function) {
+	exports.default = function (audioContext, url, onLoad, onError) {
+	  if (!audioContext instanceof AudioContext || !url instanceof String || !onLoad instanceof Function) {
 	    console.error('Invalid arguments for loadSound() function');
 	    return;
 	  }
@@ -45436,7 +45434,7 @@
 	  xhr.open('GET', url, true);
 	  xhr.responseType = 'arraybuffer';
 	  xhr.onload = function () {
-	    ctx.decodeAudioData(xhr.response, onLoad, onError);
+	    audioContext.decodeAudioData(xhr.response, onLoad, onError);
 	  };
 	  xhr.send();
 	};

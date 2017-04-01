@@ -24,8 +24,6 @@ var blob = new Blob(
 var blobURL = window.URL.createObjectURL(blob);
 var worker = new Worker(blobURL);
 
-var audioContext = new AudioContext();
-
 worker.addEventListener("message", (e) => {
   switch(e.data.type) {
     case "ready":
@@ -90,7 +88,7 @@ class MetronomeApp extends Component {
 
   componentWillMount () {
     ipcRenderer.send("initialized");
-    MetronomeActions.init(audioContext);
+    MetronomeActions.init();
     window.addEventListener("keyup", this.onKeyUp.bind(this), false);
   }
   componentWillUnmount () {

@@ -17,6 +17,8 @@ class BellIcons extends Component {
     var state = this.props.appState;
     var nextState = nextProps.appState;
     if (nextState.playing === false) {
+      last16thNoteDrawn = null;
+      next16thNote = null;
       this.setState({ active: false });
       window.cancelAnimationFrame(rafID);
     } else if (state.playing === false && nextState.playing === true) {

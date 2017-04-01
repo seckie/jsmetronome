@@ -1,7 +1,7 @@
 'use strict';
 
-export default function (ctx, url, onLoad, onError) {
-  if (! ctx instanceof AudioContext ||
+export default function (audioContext, url, onLoad, onError) {
+  if (! audioContext instanceof AudioContext ||
     ! url instanceof String ||
     ! onLoad instanceof Function) {
     console.error('Invalid arguments for loadSound() function');
@@ -13,7 +13,7 @@ export default function (ctx, url, onLoad, onError) {
   xhr.open('GET', url, true);
   xhr.responseType = 'arraybuffer';
   xhr.onload = function () {
-    ctx.decodeAudioData(xhr.response, onLoad, onError);
+    audioContext.decodeAudioData(xhr.response, onLoad, onError);
   };
   xhr.send();
 };

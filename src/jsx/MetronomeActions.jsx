@@ -2,10 +2,9 @@
 import { dispatch }  from "./MetronomeDispatcher.jsx";
 
 const MetronomeActions = {
-  init (audioContext) {
+  init () {
     dispatch({
-      type: "init",
-      audioContext: audioContext
+      type: "init"
     });
   },
   save (settings) {

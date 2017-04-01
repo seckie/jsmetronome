@@ -17,7 +17,7 @@ import loadSound from "./utils/loadSound.jsx";
 var snareBuffer, baseBuffer;
 var current16thNote = 1; // (1 <= n <= 16)
 var nextNoteTime = 0; // (sec)
-var audioContext;
+var audioContext = new AudioContext();
 var markingIndex = Constants.DEFAULT_MARKING_INDEX;
 
 class MetronomeStore extends MapStore {
@@ -46,15 +46,14 @@ class MetronomeStore extends MapStore {
 
     switch (action.type) {
       case "init":
-        loadSound(action.audioContext, './sound/snare.mp3', function (buffer) {
+        loadSound(audioContext, './sound/snare.mp3', function (buffer) {
           snareBuffer = buffer;
         });
-        loadSound(action.audioContext, './sound/base.mp3', function (buffer) {
+        loadSound(audioContext, './sound/base.mp3', function (buffer) {
           baseBuffer = buffer;
         });
 
-        audioContext = action.audioContext
-        return state.merge({ audioContext: action.audioContext });
+        return state.merge({ audioContext: audioContext });
         break;
       case "save":
         markingIndex = getMarkingIndexFromTempo(action.settings.tempo);
@@ -69,7 +68,7 @@ class MetronomeStore extends MapStore {
       case "start":
         current16thNote = 1;
         return state.merge({
-          playing: true,
+          playing: true
         });
         break;
       case "stop":
