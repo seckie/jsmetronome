@@ -16,7 +16,6 @@ var changed = require('gulp-changed');
 var data = require('gulp-data');
 var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
-var spritesmith = require('gulp.spritesmith');
 
 var packager = require('electron-packager');
 var packageJSON = require('./package.json');
@@ -39,12 +38,6 @@ var PATHS = {
   stylusEntry: [ 'src/stylus/**/!(_)*.styl' ],
   css: [ PUBLIC_PATH + 'css/**/*.css' ],
   cssDir: PUBLIC_PATH + 'css',
-
-  spriteImg: [ 'src/sprite/*' ],
-  spriteImgName: [ 'main.png' ],
-  spriteCSSName: [ 'sprite-main.styl' ],
-  spriteImgDest: PUBLIC_PATH + 'img/sprite',
-  spriteCSSDest: 'src/stylus/sprite',
 
   app: './',
   release: 'release'
@@ -104,26 +97,6 @@ gulp.task('compress', function () {
     }))
     .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest(PATHS.jsDir));
-});
-
-// sprite
-gulp.task('sprite', function (cb) {
-  var path = (PATHS.spriteImgDest).replace(PUBLIC_PATH, '/');
-  PATHS.spriteImg.forEach(function (src, i) {
-    var stream = spritesmith({
-      imgName: PATHS.spriteImgName[i],
-      cssName: PATHS.spriteCSSName[i],
-      imgPath: path + '/' + PATHS.spriteImgName[i],
-      algorithm: 'binary-tree',
-      engine: 'gmsmith',
-      imgOpts: { exportOpts: { quality: 100 } },
-      padding: 2
-    }).on('error', errorHandler);
-    var spriteData = gulp.src(src).pipe(stream);
-    spriteData.img.pipe(gulp.dest(PATHS.spriteImgDest));
-    spriteData.css.pipe(gulp.dest(PATHS.spriteCSSDest));
-  });
-  return cb();
 });
 
 // test
